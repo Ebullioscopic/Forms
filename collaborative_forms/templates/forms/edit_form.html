@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="gradient-bg">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card card-custom">
+                    <div class="card-header bg-transparent border-0">
+                        <h4 class="mb-0">{{ form_obj.title }}</h4>
+                        <p class="text-muted mb-0">{{ form_obj.description }}</p>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="mb-3">Form Fields</h5>
+                        {% if fields %}
+                            <div class="row g-3">
+                                {% for field in fields %}
+                                <div class="col-md-6">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title">{{ field.label }}</h6>
+                                                    <span class="badge bg-secondary">{{ field.get_field_type_display }}</span>
+                                                    {% if field.is_required %}
+                                                        <span class="badge bg-danger">Required</span>
+                                                    {% endif %}
+                                                </div>
+                                                <button class="btn btn-sm btn-outline-danger" 
+                                                        onclick="deleteField({{ field.id }})">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-plus-circle fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">No fields added yet</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card card-custom">
+                    <div class="card-header bg-transparent border-0">
+                        <h5 class="mb-0">Add New Field</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_field">
+                            
+                            <div class="form-floating mb-3">
+                                {{ field_form.label }}
+                                <label for="{{ field_form.label.id_for_label }}">Field Label</label>
+                            </div>
+                            
+                            <div class="form-floating mb-3">
+                                {{ field_form.field_type }}
+                                <label for="{{ field_form.field_type.id_for_label }}">Field Type</label>
+                            </div>
+                            
+                            <div class="form-floating mb-3">
+                                {{ field_form.options_text }}
+                                <label for="{{ field_form.options_text.id_for_label }}">Options</label>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                {{ field_form.is_required }}
+                                <label class="form-check-label" for="{{ field_form.is_required.id_for_label }}">
+                                    Required Field
+                                </label>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-gradient">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Add Field
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card card-custom mt-3">
+                    <div class="card-body text-center">
+                        <h6>Share Code</h6>
+                        <h3 class="text-primary">{{ form_obj.share_code }}</h3>
+                        <a href="{% url 'forms:collaborate' form_obj.share_code %}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>
+                            Preview Form
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function deleteField(fieldId) {
+    if (confirm('Are you sure you want to delete this field?')) {
+        fetch(`/forms/api/fields/${fieldId}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

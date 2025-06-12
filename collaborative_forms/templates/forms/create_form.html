@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="gradient-bg">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card card-custom">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-plus-circle fa-3x text-primary mb-3"></i>
+                            <h2 class="h3">Create New Form</h2>
+                            <p class="text-muted">Build a collaborative form for your team</p>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-floating mb-3">
+                                {{ form.title }}
+                                <label for="{{ form.title.id_for_label }}">Form Title</label>
+                            </div>
+                            <div class="form-floating mb-4">
+                                {{ form.description }}
+                                <label for="{{ form.description.id_for_label }}">Description</label>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-gradient btn-lg">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Create Form
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

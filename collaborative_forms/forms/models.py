@@ -2,14 +2,14 @@ import uuid
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-
-User = get_user_model()
+from django.conf import settings
+#User = get_user_model()
 
 class Form(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_forms')
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_forms')
     share_code = models.CharField(max_length=8, unique=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -58,7 +58,7 @@ class FormField(models.Model):
 class FormResponse(models.Model):
     form = models.OneToOneField(Form, on_delete=models.CASCADE, related_name='response')
     data = models.JSONField(default=dict)
-    last_edited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    last_edited_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     last_edited_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
@@ -66,7 +66,7 @@ class FormResponse(models.Model):
 
 class ActiveUser(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name='active_users')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(auto_now_add=True)
     last_seen = models.DateTimeField(auto_now=True)
     
@@ -76,7 +76,7 @@ class ActiveUser(models.Model):
 class FieldLock(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name='field_locks')
     field_id = models.CharField(max_length=100)
-    locked_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    locked_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     locked_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
