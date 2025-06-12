@@ -4,8 +4,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from .models import Form, FormResponse, ActiveUser, FieldLock
-from django.conf import settings
-#User = get_user_model()
+
+User = get_user_model()
 
 class FormCollaborationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -28,7 +28,7 @@ class FormCollaborationConsumer(AsyncWebsocketConsumer):
         # Add user to active users
         await self.add_active_user()
         
-        # Send current form data
+        # Send current form data - FIXED: Remove asyncio.create_task
         await self.send_form_data()
         
         # Notify others that user joined
@@ -160,6 +160,62 @@ class FormCollaborationConsumer(AsyncWebsocketConsumer):
             'user': event['user'],
         }))
 
+    # FIXED: Remove @database_sync_to_async and restructure
+    async def send_form_data(self):
+        try:
+            form_data = await self.get_form_data()
+            # Directly await self.send instead of using asyncio.create_task
+            await self.send(text_data=json.dumps(form_data))
+        except Form.DoesNotExist:
+            await self.close()
+
+    @database_sync_to_async
+    def get_form_data(self):
+        form = Form.objects.prefetch_related('fields', 'response').get(share_code=self.share_code)
+        response_data = {}
+        if hasattr(form, 'response'):
+            response_data = form.response.data
+        
+        active_users = list(ActiveUser.objects.filter(form=form).select_related('user'))
+        field_locks = list(FieldLock.objects.filter(form=form).select_related('locked_by'))
+        
+        return {
+            'type': 'form_data',
+            'form': {
+                'title': form.title,
+                'description': form.description,
+                'fields': [
+                    {
+                        'id': f'field_{field.id}',
+                        'label': field.label,
+                        'type': field.field_type,
+                        'options': field.options,
+                        'required': field.is_required,
+                    }
+                    for field in form.fields.all()
+                ]
+            },
+            'response_data': response_data,
+            'active_users': [
+                {
+                    'id': au.user.id,
+                    'username': au.user.username,
+                    'avatar_color': au.user.avatar_color,
+                }
+                for au in active_users
+            ],
+            'field_locks': [
+                {
+                    'field_id': fl.field_id,
+                    'locked_by': {
+                        'id': fl.locked_by.id,
+                        'username': fl.locked_by.username,
+                    }
+                }
+                for fl in field_locks
+            ]
+        }
+
     # Database operations
     @database_sync_to_async
     def add_active_user(self):
@@ -180,56 +236,6 @@ class FormCollaborationConsumer(AsyncWebsocketConsumer):
             'username': user.username,
             'avatar_color': user.avatar_color,
         }
-
-    @database_sync_to_async
-    def send_form_data(self):
-        try:
-            form = Form.objects.prefetch_related('fields', 'response').get(share_code=self.share_code)
-            response_data = {}
-            if hasattr(form, 'response'):
-                response_data = form.response.data
-            
-            active_users = list(ActiveUser.objects.filter(form=form).select_related('user'))
-            field_locks = list(FieldLock.objects.filter(form=form).select_related('locked_by'))
-            
-            asyncio.create_task(self.send(text_data=json.dumps({
-                'type': 'form_data',
-                'form': {
-                    'title': form.title,
-                    'description': form.description,
-                    'fields': [
-                        {
-                            'id': f'field_{field.id}',
-                            'label': field.label,
-                            'type': field.field_type,
-                            'options': field.options,
-                            'required': field.is_required,
-                        }
-                        for field in form.fields.all()
-                    ]
-                },
-                'response_data': response_data,
-                'active_users': [
-                    {
-                        'id': au.user.id,
-                        'username': au.user.username,
-                        'avatar_color': au.user.avatar_color,
-                    }
-                    for au in active_users
-                ],
-                'field_locks': [
-                    {
-                        'field_id': fl.field_id,
-                        'locked_by': {
-                            'id': fl.locked_by.id,
-                            'username': fl.locked_by.username,
-                        }
-                    }
-                    for fl in field_locks
-                ]
-            })))
-        except Form.DoesNotExist:
-            asyncio.create_task(self.close())
 
     @database_sync_to_async
     def update_form_response(self, field_id, value):
