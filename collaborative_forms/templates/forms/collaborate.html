@@ -1,0 +1,388 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ form.title }} - Collaborative Form{% endblock %}
+
+{% block content %}
+<div class="gradient-bg">
+    <div class="container py-5">
+        <!-- Active Users Display -->
+        <div class="active-users">
+            <div class="card card-custom p-3">
+                <h6 class="mb-2">Active Users</h6>
+                <div id="active-users-list" class="d-flex flex-wrap gap-2"></div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card card-custom">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <h1 class="h2 mb-3">{{ form.title }}</h1>
+                            {% if form.description %}
+                                <p class="text-muted">{{ form.description }}</p>
+                            {% endif %}
+                            <div class="badge bg-success mb-3">
+                                <i class="fas fa-share-alt me-1"></i>
+                                Code: {{ share_code }}
+                            </div>
+                        </div>
+
+                        <div id="connection-status" class="alert alert-info">
+                            <i class="fas fa-spinner fa-spin me-2"></i>
+                            Connecting to collaboration server...
+                        </div>
+
+                        <form id="collaborative-form">
+                            <div id="form-fields"></div>
+                            
+                            <div class="text-center mt-4">
+                                <button type="button" class="btn btn-gradient btn-lg px-5" id="save-response">
+                                    <i class="fas fa-save me-2"></i>
+                                    Save Response
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Field Lock Modal -->
+<div class="modal fade" id="fieldLockModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <i class="fas fa-lock text-warning fa-2x mb-3"></i>
+                <p>This field is being edited by another user.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+class CollaborativeForm {
+    constructor(shareCode) {
+        this.shareCode = shareCode;
+        this.socket = null;
+        this.formData = {};
+        this.activeUsers = new Map();
+        this.fieldLocks = new Map();
+        this.init();
+    }
+
+    init() {
+        this.connect();
+        this.setupEventListeners();
+    }
+
+    connect() {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/forms/${this.shareCode}/`;
+        
+        this.socket = new WebSocket(wsUrl);
+        
+        this.socket.onopen = () => {
+            document.getElementById('connection-status').innerHTML = `
+                <i class="fas fa-check-circle text-success me-2"></i>
+                Connected! You can now collaborate in real-time.
+            `;
+            document.getElementById('connection-status').className = 'alert alert-success';
+        };
+        
+        this.socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            this.handleMessage(data);
+        };
+        
+        this.socket.onclose = () => {
+            document.getElementById('connection-status').innerHTML = `
+                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                Connection lost. Attempting to reconnect...
+            `;
+            document.getElementById('connection-status').className = 'alert alert-warning';
+            setTimeout(() => this.connect(), 3000);
+        };
+        
+        this.socket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+    }
+
+    handleMessage(data) {
+        switch(data.type) {
+            case 'form_data':
+                this.renderForm(data);
+                break;
+            case 'field_changed':
+                this.updateField(data.field_id, data.value, data.user);
+                break;
+            case 'field_locked':
+                this.lockField(data.field_id, data.user);
+                break;
+            case 'field_unlocked':
+                this.unlockField(data.field_id);
+                break;
+            case 'user_joined':
+                this.addActiveUser(data.user);
+                break;
+            case 'user_left':
+                this.removeActiveUser(data.user);
+                break;
+        }
+    }
+
+    renderForm(data) {
+        this.formData = data.form;
+        const fieldsContainer = document.getElementById('form-fields');
+        fieldsContainer.innerHTML = '';
+
+        data.form.fields.forEach(field => {
+            const fieldHtml = this.createFieldHtml(field, data.response_data[field.id] || '');
+            fieldsContainer.appendChild(fieldHtml);
+        });
+
+        // Update active users
+        data.active_users.forEach(user => this.addActiveUser(user));
+        
+        // Set field locks
+        data.field_locks.forEach(lock => this.lockField(lock.field_id, lock.locked_by));
+    }
+
+    createFieldHtml(field, value) {
+        const div = document.createElement('div');
+        div.className = 'mb-4';
+        
+        let inputHtml = '';
+        const requiredAttr = field.required ? 'required' : '';
+        const requiredMark = field.required ? '<span class="text-danger">*</span>' : '';
+        
+        switch(field.type) {
+            case 'text':
+            case 'email':
+            case 'number':
+                inputHtml = `
+                    <div class="form-floating">
+                        <input type="${field.type}" class="form-control" id="${field.id}" 
+                               value="${value}" ${requiredAttr} placeholder="${field.label}">
+                        <label for="${field.id}">${field.label} ${requiredMark}</label>
+                    </div>
+                `;
+                break;
+            case 'textarea':
+                inputHtml = `
+                    <div class="form-floating">
+                        <textarea class="form-control" id="${field.id}" ${requiredAttr} 
+                                style="height: 100px" placeholder="${field.label}">${value}</textarea>
+                        <label for="${field.id}">${field.label} ${requiredMark}</label>
+                    </div>
+                `;
+                break;
+            case 'dropdown':
+                const options = field.options.map(opt => 
+                    `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`
+                ).join('');
+                inputHtml = `
+                    <div class="form-floating">
+                        <select class="form-select" id="${field.id}" ${requiredAttr}>
+                            <option value="">Choose...</option>
+                            ${options}
+                        </select>
+                        <label for="${field.id}">${field.label} ${requiredMark}</label>
+                    </div>
+                `;
+                break;
+            case 'checkbox':
+                inputHtml = `
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="${field.id}" 
+                               ${value ? 'checked' : ''} ${requiredAttr}>
+                        <label class="form-check-label" for="${field.id}">
+                            ${field.label} ${requiredMark}
+                        </label>
+                    </div>
+                `;
+                break;
+            case 'radio':
+                const radioOptions = field.options.map(opt => `
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="${field.id}" 
+                               id="${field.id}_${opt}" value="${opt}" ${value === opt ? 'checked' : ''}>
+                        <label class="form-check-label" for="${field.id}_${opt}">
+                            ${opt}
+                        </label>
+                    </div>
+                `).join('');
+                inputHtml = `
+                    <fieldset>
+                        <legend class="form-label">${field.label} ${requiredMark}</legend>
+                        ${radioOptions}
+                    </fieldset>
+                `;
+                break;
+        }
+        
+        div.innerHTML = inputHtml;
+        return div;
+    }
+
+    setupEventListeners() {
+        document.addEventListener('input', (e) => {
+            if (e.target.closest('#form-fields')) {
+                this.handleFieldChange(e.target);
+            }
+        });
+        
+        document.addEventListener('focus', (e) => {
+            if (e.target.closest('#form-fields')) {
+                this.handleFieldFocus(e.target);
+            }
+        }, true);
+        
+        document.addEventListener('blur', (e) => {
+            if (e.target.closest('#form-fields')) {
+                this.handleFieldBlur(e.target);
+            }
+        }, true);
+
+        document.getElementById('save-response').addEventListener('click', () => {
+            this.saveResponse();
+        });
+    }
+
+    handleFieldChange(element) {
+        if (this.fieldLocks.has(element.id)) return;
+        
+        let value = element.value;
+        if (element.type === 'checkbox') {
+            value = element.checked;
+        }
+        
+        this.sendMessage({
+            action: 'field_change',
+            field_id: element.id,
+            value: value
+        });
+    }
+
+    handleFieldFocus(element) {
+        this.sendMessage({
+            action: 'field_focus',
+            field_id: element.id
+        });
+    }
+
+    handleFieldBlur(element) {
+        this.sendMessage({
+            action: 'field_blur',
+            field_id: element.id
+        });
+    }
+
+    updateField(fieldId, value, user) {
+        const element = document.getElementById(fieldId);
+        if (!element) return;
+        
+        if (element.type === 'checkbox') {
+            element.checked = value;
+        } else {
+            element.value = value;
+        }
+        
+        // Show temporary indicator
+        this.showFieldUpdate(element, user);
+    }
+
+    lockField(fieldId, user) {
+        this.fieldLocks.set(fieldId, user);
+        const element = document.getElementById(fieldId);
+        if (element) {
+            element.classList.add('field-locked');
+            element.disabled = true;
+            element.title = `Being edited by ${user.username}`;
+        }
+    }
+
+    unlockField(fieldId) {
+        this.fieldLocks.delete(fieldId);
+        const element = document.getElementById(fieldId);
+        if (element) {
+            element.classList.remove('field-locked');
+            element.disabled = false;
+            element.title = '';
+        }
+    }
+
+    addActiveUser(user) {
+        this.activeUsers.set(user.id, user);
+        this.updateActiveUsersList();
+    }
+
+    removeActiveUser(user) {
+        this.activeUsers.delete(user.id);
+        this.updateActiveUsersList();
+    }
+
+    updateActiveUsersList() {
+        const container = document.getElementById('active-users-list');
+        container.innerHTML = '';
+        
+        this.activeUsers.forEach(user => {
+            const userEl = document.createElement('div');
+            userEl.className = 'user-avatar pulse';
+            userEl.style.backgroundColor = user.avatar_color;
+            userEl.textContent = user.username.charAt(0).toUpperCase();
+            userEl.title = user.username;
+            container.appendChild(userEl);
+        });
+    }
+
+    showFieldUpdate(element, user) {
+        const indicator = document.createElement('div');
+        indicator.className = 'position-absolute bg-primary text-white px-2 py-1 rounded small';
+        indicator.style.cssText = 'top: -30px; right: 0; z-index: 1000; font-size: 11px;';
+        indicator.textContent = `Updated by ${user.username}`;
+        
+        element.parentElement.style.position = 'relative';
+        element.parentElement.appendChild(indicator);
+        
+        setTimeout(() => {
+            indicator.remove();
+        }, 2000);
+    }
+
+    saveResponse() {
+        const btn = document.getElementById('save-response');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+        btn.disabled = true;
+        
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-check me-2"></i>Saved!';
+            btn.className = 'btn btn-success btn-lg px-5';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.className = 'btn btn-gradient btn-lg px-5';
+                btn.disabled = false;
+            }, 2000);
+        }, 1000);
+    }
+
+    sendMessage(data) {
+        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            this.socket.send(JSON.stringify(data));
+        }
+    }
+}
+
+// Initialize collaborative form
+document.addEventListener('DOMContentLoaded', () => {
+    new CollaborativeForm('{{ share_code }}');
+});
+</script>
+{% endblock %}
