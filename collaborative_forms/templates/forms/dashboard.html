@@ -47,6 +47,8 @@
                     </div>
                     <h3 class="h5 mb-1">Real-time</h3>
                     <p class="text-muted mb-0 small">Collaboration</p>
+                </div>
+            </div>
         </div>
         
         <div class="col-xl-3 col-lg-4 col-md-6">
@@ -146,6 +148,11 @@
                                 <span class="badge rounded-pill" style="background-color: var(--background-tertiary); color: var(--text-secondary); font-size: 11px;">
                                     {{ form.share_code }}
                                 </span>
+                                <button class="btn btn-sm p-1 ms-1" 
+                                        onclick="copyToClipboard('{{ form.share_code }}')"
+                                        title="Copy share code">
+                                    <i class="fas fa-clipboard text-muted" style="font-size: 12px;"></i>
+                                </button>
                                 <span class="text-muted ms-2" style="font-size: 12px;">
                                     {{ form.created_at|date:"M d" }}
                                 </span>
@@ -182,4 +189,123 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function() {
+            showCopySuccess(event.target.closest('button'));
+        }).catch(function(err) {
+            console.error('Failed to copy: ', err);
+            fallbackCopyTextToClipboard(text);
+        });
+    } else {
+        fallbackCopyTextToClipboard(text);
+    }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showCopySuccess(event.target.closest('button'));
+    } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showCopySuccess(button) {
+    const icon = button.querySelector('i');
+    const originalClass = icon.className;
+    
+    // Change icon
+    icon.className = 'fas fa-check text-success';
+    
+    // Show toast notification
+    showToast('Share code copied to clipboard!', 'success');
+    
+    setTimeout(() => {
+        icon.className = originalClass;
+    }, 2000);
+}
+
+function showToast(message, type = 'success') {
+    // Remove any existing toasts
+    const existingToast = document.querySelector('.copy-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `copy-toast alert alert-${type} d-flex align-items-center`;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 250px;
+        box-shadow: var(--shadow-medium);
+        border: none;
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    toast.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>
+        <span>${message}</span>
+    `;
+    
+    // Add CSS for animation
+    if (!document.querySelector('#toast-styles')) {
+        const style = document.createElement('style');
+        style.id = 'toast-styles';
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 300);
+    }, 3000);
+}
+</script>
 {% endblock %}
