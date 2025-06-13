@@ -1,159 +1,175 @@
 {% extends 'base.html' %}
 
+{% block title %}Dashboard - CollabForms{% endblock %}
+
 {% block content %}
 <div class="page-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="h3 mb-2">Welcome back, {{ user.username }}!</h1>
+    <div class="page-container">
+        <div class="d-flex justify-content-between align-items-center py-4">
+            <div>
+                <h1 class="h4 mb-2">Welcome back, {{ user.username }}!</h1>
                 <p class="text-muted mb-0">Manage and collaborate on forms with your team</p>
             </div>
-            <div class="col-md-4 text-md-end">
-                <div class="d-flex gap-2 justify-content-md-end">
-                    <a href="{% url 'forms:join_form' %}" class="btn btn-secondary-modern">
-                        <i class="fas fa-sign-in-alt me-1"></i>Join Form
+            <div class="d-flex gap-2">
+                <a href="{% url 'forms:join_form' %}" class="btn btn-google-secondary">
+                    <i class="fas fa-sign-in-alt me-1"></i>Join Form
+                </a>
+                {% if is_admin %}
+                    <a href="{% url 'forms:create_form' %}" class="btn btn-google-primary">
+                        <i class="fas fa-plus me-1"></i>Create Form
                     </a>
-                    {% if is_admin %}
-                        <a href="{% url 'forms:create_form' %}" class="btn btn-primary-modern">
-                            <i class="fas fa-plus me-1"></i>Create Form
-                        </a>
-                    {% endif %}
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<div class="container py-4">
-    <div class="row g-4">
-        <!-- Stats Cards -->
+<div class="page-container py-4">
+    <!-- Stats Overview -->
+    <div class="row g-3 mb-4">
         <div class="col-md-4">
-            <div class="card-modern p-4 text-center">
-                <i class="fas fa-clipboard-list fa-2x text-primary mb-3"></i>
-                <h3 class="h5 mb-1">{{ user_forms|length }}</h3>
-                <p class="text-muted mb-0">{% if is_admin %}Forms Created{% else %}Forms Joined{% endif %}</p>
+            <div class="form-card">
+                <div class="form-card-body text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3" style="width: 64px; height: 64px;">
+                        <i class="fas fa-poll-h fa-lg text-primary"></i>
+                    </div>
+                    <h3 class="h5 mb-1">{{ user_forms|length }}</h3>
+                    <p class="text-muted mb-0 small">{% if is_admin %}Forms Created{% else %}Forms Joined{% endif %}</p>
+                </div>
             </div>
         </div>
         
         <div class="col-md-4">
-            <div class="card-modern p-4 text-center">
-                <i class="fas fa-users fa-2x text-success mb-3"></i>
-                <h3 class="h5 mb-1">{{ user.username|length }}</h3>
-                <p class="text-muted mb-0">Collaborations</p>
+            <div class="form-card">
+                <div class="form-card-body text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3" style="width: 64px; height: 64px;">
+                        <i class="fas fa-users fa-lg" style="color: var(--success-color);"></i>
+                    </div>
+                    <h3 class="h5 mb-1">Real-time</h3>
+                    <p class="text-muted mb-0 small">Collaboration</p>
+                </div>
             </div>
         </div>
         
         <div class="col-md-4">
-            <div class="card-modern p-4 text-center">
-                <i class="fas fa-chart-line fa-2x text-warning mb-3"></i>
-                <h3 class="h5 mb-1">Real-time</h3>
-                <p class="text-muted mb-0">Synchronization</p>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        {% if not is_admin %}
-        <div class="col-12">
-            <div class="card-modern p-4">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h5 class="mb-2">
-                            <i class="fas fa-rocket me-2 text-primary"></i>
-                            Ready to collaborate?
-                        </h5>
-                        <p class="text-muted mb-0">Enter a share code to join a form and start collaborating with your team.</p>
+            <div class="form-card">
+                <div class="form-card-body text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3" style="width: 64px; height: 64px;">
+                        <i class="fas fa-sync-alt fa-lg" style="color: var(--warning-color);"></i>
                     </div>
-                    <div class="col-md-4 text-md-end">
-                        <a href="{% url 'forms:join_form' %}" class="btn btn-primary-modern">
-                            <i class="fas fa-sign-in-alt me-2"></i>Join a Form
-                        </a>
-                    </div>
+                    <h3 class="h5 mb-1">Instant</h3>
+                    <p class="text-muted mb-0 small">Synchronization</p>
                 </div>
             </div>
         </div>
-        {% endif %}
+    </div>
 
-        <!-- Forms List -->
-        {% if is_admin and user_forms %}
-        <div class="col-12">
-            <div class="card-modern">
-                <div class="p-4 border-bottom">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-folder me-2 text-muted"></i>
-                            My Forms
-                        </h5>
-                        <span class="badge bg-light text-dark">{{ user_forms|length }} form{{ user_forms|length|pluralize }}</span>
+    <!-- Quick Action for Users -->
+    {% if not is_admin %}
+    <div class="form-card mb-4">
+        <div class="form-card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-start">
+                        <div class="me-3">
+                            <i class="fas fa-rocket fa-lg text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-2">Ready to collaborate?</h5>
+                            <p class="text-muted mb-0">Enter a share code to join a form and start collaborating with your team in real-time.</p>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="p-4">
-                    <div class="row g-3">
-                        {% for form in user_forms %}
-                        <div class="col-lg-6">
-                            <div class="card border-0 bg-light">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div class="flex-grow-1">
-                                            <h6 class="card-title mb-2">{{ form.title }}</h6>
-                                            <p class="card-text text-muted small mb-3">
-                                                {{ form.description|truncatechars:100|default:"No description" }}
-                                            </p>
-                                        </div>
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="{% url 'forms:edit_form' form.id %}">
-                                                    <i class="fas fa-edit me-2"></i>Edit
-                                                </a></li>
-                                                <li><a class="dropdown-item" href="{% url 'forms:collaborate' form.share_code %}">
-                                                    <i class="fas fa-eye me-2"></i>Preview
-                                                </a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <span class="badge bg-primary">{{ form.share_code }}</span>
-                                            <span class="text-muted small ms-2">
-                                                <i class="fas fa-calendar me-1"></i>
-                                                {{ form.created_at|date:"M d" }}
-                                            </span>
-                                        </div>
-                                        <div class="btn-group" role="group">
-                                            <a href="{% url 'forms:edit_form' form.id %}" 
-                                               class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <a href="{% url 'forms:collaborate' form.share_code %}" 
-                                               class="btn btn-sm btn-primary">
-                                                <i class="fas fa-external-link-alt"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <a href="{% url 'forms:join_form' %}" class="btn btn-google-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Join a Form
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Forms List -->
+    {% if is_admin and user_forms %}
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Recent forms</h2>
+                <span class="text-muted small">{{ user_forms|length }} form{{ user_forms|length|pluralize }}</span>
+            </div>
+        </div>
+        
+        <div class="form-card-body">
+            <div class="row g-3">
+                {% for form in user_forms %}
+                <div class="col-lg-6">
+                    <div class="border rounded p-3 h-100" style="border-color: var(--border-color) !important; background-color: #fafbfc;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-2 fw-normal">{{ form.title }}</h6>
+                                <p class="text-muted small mb-0" style="font-size: 12px; line-height: 1.4;">
+                                    {% if form.description %}
+                                        {{ form.description|truncatechars:80 }}
+                                    {% else %}
+                                        No description
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-sm" style="color: var(--text-secondary);" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{% url 'forms:edit_form' form.id %}">
+                                        <i class="fas fa-edit me-2"></i>Edit form
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{% url 'forms:collaborate' form.share_code %}">
+                                        <i class="fas fa-eye me-2"></i>Preview form
+                                    </a></li>
+                                </ul>
                             </div>
                         </div>
-                        {% endfor %}
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <span class="badge rounded-pill" style="background-color: var(--background-tertiary); color: var(--text-secondary); font-size: 11px;">
+                                    {{ form.share_code }}
+                                </span>
+                                <span class="text-muted ms-2" style="font-size: 12px;">
+                                    {{ form.created_at|date:"M d" }}
+                                </span>
+                            </div>
+                            <div>
+                                <a href="{% url 'forms:edit_form' form.id %}" 
+                                   class="btn btn-sm btn-google-text p-1" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'forms:collaborate' form.share_code %}" 
+                                   class="btn btn-sm btn-google-text p-1" title="Open">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
-        {% elif is_admin %}
-        <div class="col-12">
-            <div class="card-modern p-5 text-center">
-                <i class="fas fa-clipboard fa-4x text-muted mb-4"></i>
-                <h5 class="mb-3">No forms created yet</h5>
-                <p class="text-muted mb-4">Get started by creating your first collaborative form</p>
-                <a href="{% url 'forms:create_form' %}" class="btn btn-primary-modern">
-                    <i class="fas fa-plus me-2"></i>Create Your First Form
-                </a>
-            </div>
-        </div>
-        {% endif %}
     </div>
+    {% elif is_admin %}
+    <div class="form-card">
+        <div class="form-card-body text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-poll-h fa-3x text-muted"></i>
+            </div>
+            <h3 class="h5 mb-3">Create your first form</h3>
+            <p class="text-muted mb-4">Get started by creating a form that your team can collaborate on in real-time.</p>
+            <a href="{% url 'forms:create_form' %}" class="btn btn-google-primary">
+                <i class="fas fa-plus me-2"></i>Create form
+            </a>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

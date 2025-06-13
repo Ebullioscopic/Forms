@@ -6,126 +6,201 @@
     <title>{% block title %}CollabForms{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Google Forms inspired grayscale palette */
+            /* Google Forms exact color palette */
             --primary-color: #1a73e8;
-            --primary-hover: #1565c0;
+            --primary-hover: #1557b0;
             --secondary-color: #5f6368;
             --text-primary: #202124;
             --text-secondary: #5f6368;
             --text-muted: #9aa0a6;
             --border-color: #dadce0;
-            --border-focus: #1a73e8;
+            --border-focus: #4285f4;
             --background-primary: #ffffff;
-            --background-secondary: #f8f9fa;
-            --background-tertiary: #f1f3f4;
+            --background-secondary: #f1f3f4;
+            --background-tertiary: #e8eaed;
             --surface-color: #ffffff;
+            --surface-raised: #ffffff;
             --shadow-light: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
             --shadow-medium: 0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
             --shadow-heavy: 0 2px 6px 2px rgba(60,64,67,.15), 0 8px 24px 4px rgba(60,64,67,.15);
             --success-color: #34a853;
             --warning-color: #fbbc04;
             --error-color: #ea4335;
+            --purple-accent: #9c27b0;
+            --forms-purple: #673ab7;
         }
         
         * {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
         
         body {
             background-color: var(--background-secondary);
             color: var(--text-primary);
             line-height: 1.6;
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
         }
         
+        /* Google Forms-style header */
         .navbar {
             background: var(--surface-color) !important;
             border-bottom: 1px solid var(--border-color);
             box-shadow: var(--shadow-light);
+            min-height: 64px;
+            padding: 0;
         }
         
         .navbar-brand {
-            font-weight: 600;
+            font-family: 'Google Sans', sans-serif;
+            font-weight: 500;
             color: var(--text-primary) !important;
-            font-size: 1.5rem;
+            font-size: 22px;
+            padding: 0;
+            margin: 0;
         }
         
-        .card-modern {
+        .navbar-brand i {
+            color: var(--forms-purple);
+            margin-right: 8px;
+        }
+        
+        /* Google Forms-style cards */
+        .form-card {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            box-shadow: var(--shadow-light);
-            transition: all 0.2s ease;
-        }
-        
-        .card-modern:hover {
-            box-shadow: var(--shadow-medium);
-        }
-        
-        .btn-primary-modern {
-            background-color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            color: white;
             border-radius: 8px;
-            font-weight: 500;
-            padding: 10px 24px;
-            transition: all 0.2s ease;
+            box-shadow: var(--shadow-light);
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            overflow: hidden;
         }
         
-        .btn-primary-modern:hover {
-            background-color: var(--primary-hover);
-            border-color: var(--primary-hover);
-            color: white;
-            transform: translateY(-1px);
+        .form-card:hover {
             box-shadow: var(--shadow-medium);
         }
         
-        .btn-secondary-modern {
+        .form-card-header {
+            border-top: 10px solid var(--forms-purple);
+            padding: 24px 24px 0 24px;
+            background: var(--surface-color);
+        }
+        
+        .form-card-body {
+            padding: 24px;
+        }
+        
+        /* Google Forms-style buttons */
+        .btn-google-primary {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            padding: 8px 24px;
+            height: 40px;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            text-transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-google-primary:hover {
+            background-color: var(--primary-hover);
+            color: white;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+        }
+        
+        .btn-google-secondary {
             background-color: transparent;
             border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 8px;
+            color: var(--primary-color);
+            border-radius: 4px;
             font-weight: 500;
-            padding: 10px 24px;
-            transition: all 0.2s ease;
+            font-size: 14px;
+            padding: 8px 24px;
+            height: 40px;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            text-transform: none;
         }
         
-        .btn-secondary-modern:hover {
-            background-color: var(--background-tertiary);
-            color: var(--text-primary);
-            border-color: var(--text-secondary);
+        .btn-google-secondary:hover {
+            background-color: rgba(26, 115, 232, 0.04);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
         }
         
-        .form-control-modern {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px 16px;
-            background-color: var(--surface-color);
-            transition: all 0.2s ease;
+        .btn-google-text {
+            background: transparent;
+            border: none;
+            color: var(--primary-color);
+            font-weight: 500;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        
+        .btn-google-text:hover {
+            background-color: rgba(26, 115, 232, 0.04);
+            color: var(--primary-color);
+        }
+        
+        /* Google Forms-style form inputs */
+        .form-input-google {
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 4px 4px 0 0;
+            background-color: #f8f9fa;
+            padding: 16px 16px 6px 16px;
             font-size: 16px;
+            line-height: 1.5;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            width: 100%;
         }
         
-        .form-control-modern:focus {
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
-            background-color: var(--surface-color);
+        .form-input-google:focus {
+            outline: none;
+            border-bottom: 2px solid var(--primary-color);
+            background-color: #fafbfc;
         }
         
-        .form-floating-modern > .form-control-modern {
-            padding-top: 1.625rem;
-            padding-bottom: 0.625rem;
+        .form-floating-google {
+            position: relative;
         }
         
-        .form-floating-modern > label {
+        .form-floating-google > .form-input-google {
+            padding-top: 20px;
+            padding-bottom: 4px;
+        }
+        
+        .form-floating-google > label {
+            position: absolute;
+            top: 0;
+            left: 16px;
+            padding-top: 16px;
             color: var(--text-secondary);
+            font-size: 16px;
             font-weight: 400;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            pointer-events: none;
+            transform-origin: 0 0;
         }
         
+        .form-floating-google > .form-input-google:focus ~ label,
+        .form-floating-google > .form-input-google:not(:placeholder-shown) ~ label {
+            transform: translateY(-50%) scale(0.75);
+            color: var(--primary-color);
+            padding-top: 4px;
+        }
+        
+        /* User avatar */
         .user-avatar {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -133,8 +208,218 @@
             color: white;
             font-weight: 500;
             font-size: 14px;
-            background: linear-gradient(135deg, var(--secondary-color), var(--text-secondary));
+            background: linear-gradient(135deg, var(--primary-color), var(--forms-purple));
         }
+        
+        /* Connection status */
+        .connection-status {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1050;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .connection-connected {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .connection-connecting {
+            background-color: var(--warning-color);
+            color: var(--text-primary);
+        }
+        
+        .connection-disconnected {
+            background-color: var(--error-color);
+            color: white;
+        }
+        
+        /* Page layouts */
+        .page-container {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .auth-card {
+            background: var(--surface-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow-heavy);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+        }
+        
+        .auth-header {
+            text-align: center;
+            padding: 48px 40px 24px 40px;
+        }
+        
+        .auth-body {
+            padding: 0 40px 48px 40px;
+        }
+        
+        .auth-logo {
+            color: var(--forms-purple);
+            font-size: 48px;
+            margin-bottom: 24px;
+        }
+        
+        .auth-title {
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .auth-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+        
+        /* Dropdown menus */
+        .dropdown-menu {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow-medium);
+            padding: 8px 0;
+            min-width: 200px;
+        }
+        
+        .dropdown-item {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: var(--text-primary);
+            border: none;
+            background: none;
+            transition: background-color 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--background-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .dropdown-divider {
+            margin: 8px 0;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* Alert messages */
+        .alert {
+            border-radius: 4px;
+            border: none;
+            font-size: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .alert-success {
+            background-color: #e8f5e8;
+            color: #1e7e34;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        /* Loading animations */
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 0 12px;
+            }
+            
+            .auth-container {
+                padding: 12px;
+            }
+            
+            .auth-header {
+                padding: 32px 24px 16px 24px;
+            }
+            
+            .auth-body {
+                padding: 0 24px 32px 24px;
+            }
+            
+            .navbar-brand {
+                font-size: 20px;
+            }
+            
+            .connection-status {
+                bottom: 16px;
+                right: 16px;
+            }
+        }
+        
+        /* Form field specific styles */
+        .form-group-google {
+            margin-bottom: 24px;
+        }
+        
+        .form-error {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 8px;
+            margin-left: 16px;
+        }
+        
+        .form-help {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: 8px;
+            margin-left: 16px;
+        }
+        
         
         .field-locked {
             border-color: var(--error-color) !important;
@@ -161,17 +446,17 @@
         .status-editing { background-color: var(--warning-color); }
         
         .page-header {
-            background: linear-gradient(135deg, var(--background-secondary), var(--background-tertiary));
+            background: var(--surface-color);
             border-bottom: 1px solid var(--border-color);
-            padding: 2rem 0;
+            padding: 24px 0;
         }
         
         .form-section {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
         }
         
         .form-section:hover {
@@ -179,106 +464,35 @@
         }
         
         .form-field-wrapper {
-            padding: 1.5rem;
+            padding: 24px;
             border-bottom: 1px solid var(--background-tertiary);
         }
         
         .form-field-wrapper:last-child {
             border-bottom: none;
         }
-        
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .connection-status {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            border-radius: 24px;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .connection-connected {
-            background-color: var(--success-color);
-            color: white;
-        }
-        
-        .connection-connecting {
-            background-color: var(--warning-color);
-            color: white;
-        }
-        
-        .connection-disconnected {
-            background-color: var(--error-color);
-            color: white;
-        }
-        
-        .dropdown-menu {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: var(--shadow-medium);
-        }
-        
-        .dropdown-item:hover {
-            background-color: var(--background-tertiary);
-        }
-        
-        @media (max-width: 768px) {
-            .active-users-panel {
-                position: relative;
-                top: auto;
-                right: auto;
-                margin-bottom: 1rem;
-            }
-        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
     <nav class="navbar navbar-expand-lg">
-        <div class="container">
+        <div class="container-fluid px-4">
             <a class="navbar-brand d-flex align-items-center" href="{% url 'forms:dashboard' %}">
-                <i class="fas fa-clipboard-list me-2 text-primary"></i>
+                <i class="fas fa-poll-h me-2"></i>
                 CollabForms
             </a>
             
             <div class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
                     <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center text-decoration-none" 
+                        <a class="nav-link dropdown-toggle d-flex align-items-center text-decoration-none p-2" 
                            href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                             <div class="user-avatar me-2">
                                 {{ user.username|first|upper }}
                             </div>
                             <span class="me-1">{{ user.username }}</span>
-                            {% if user.is_admin %}
-                                <span class="badge bg-primary ms-2">Admin</span>
-                            {% endif %}
                         </a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item d-flex align-items-center" href="{% url 'forms:dashboard' %}">
                                 <i class="fas fa-tachometer-alt me-3 text-muted"></i>Dashboard
                             </a></li>
@@ -297,11 +511,11 @@
                         </ul>
                     </div>
                 {% else %}
-                    <a class="nav-link text-decoration-none me-3" href="{% url 'accounts:login' %}">
-                        <i class="fas fa-sign-in-alt me-1"></i>Login
+                    <a class="btn btn-google-text me-2" href="{% url 'accounts:login' %}">
+                        <i class="fas fa-sign-in-alt me-1"></i>Sign in
                     </a>
-                    <a class="btn btn-primary-modern" href="{% url 'accounts:register' %}">
-                        <i class="fas fa-user-plus me-1"></i>Sign Up
+                    <a class="btn btn-google-primary" href="{% url 'accounts:register' %}">
+                        <i class="fas fa-user-plus me-1"></i>Sign up
                     </a>
                 {% endif %}
             </div>
@@ -310,7 +524,7 @@
 
     <main>
         {% if messages %}
-            <div class="container mt-3">
+            <div class="page-container mt-3">
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }} alert-dismissible fade show fade-in" role="alert">
                         <i class="fas fa-info-circle me-2"></i>{{ message }}
@@ -324,6 +538,164 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    // Google Forms-style form field rendering
+    function renderFormField(field, value = '', userEditing = null) {
+        const isLocked = userEditing && userEditing.id !== window.currentUserId;
+        const lockClass = isLocked ? 'field-locked' : '';
+        const lockIcon = isLocked ? `<i class="fas fa-lock text-warning ms-2" title="Being edited by ${userEditing.username}"></i>` : '';
+        
+        let fieldHtml = `
+            <div class="form-card mb-3 fade-in" data-field-id="${field.id}">
+                <div class="form-card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <label class="form-label fw-normal">${field.label}</label>
+                            ${field.is_required ? '<span class="text-danger ms-1">*</span>' : ''}
+                            ${lockIcon}
+                        </div>
+                    </div>
+        `;
+        
+        switch(field.field_type) {
+            case 'text':
+            case 'email':
+            case 'url':
+                fieldHtml += `
+                    <div class="form-floating-google">
+                        <input type="${field.field_type}" 
+                               class="form-input-google ${lockClass}" 
+                               id="field_${field.id}" 
+                               name="field_${field.id}" 
+                               placeholder=" "
+                               value="${value}"
+                               ${field.is_required ? 'required' : ''}
+                               ${isLocked ? 'disabled' : ''}>
+                        <label for="field_${field.id}">Your answer</label>
+                    </div>
+                `;
+                break;
+                
+            case 'textarea':
+                fieldHtml += `
+                    <div class="form-floating-google">
+                        <textarea class="form-input-google ${lockClass}" 
+                                  id="field_${field.id}" 
+                                  name="field_${field.id}" 
+                                  placeholder=" "
+                                  rows="3"
+                                  style="min-height: 100px; resize: vertical;"
+                                  ${field.is_required ? 'required' : ''}
+                                  ${isLocked ? 'disabled' : ''}>${value}</textarea>
+                        <label for="field_${field.id}">Your answer</label>
+                    </div>
+                `;
+                break;
+                
+            case 'number':
+                fieldHtml += `
+                    <div class="form-floating-google">
+                        <input type="number" 
+                               class="form-input-google ${lockClass}" 
+                               id="field_${field.id}" 
+                               name="field_${field.id}" 
+                               placeholder=" "
+                               value="${value}"
+                               ${field.is_required ? 'required' : ''}
+                               ${isLocked ? 'disabled' : ''}>
+                        <label for="field_${field.id}">Your answer</label>
+                    </div>
+                `;
+                break;
+                
+            case 'select':
+                fieldHtml += `
+                    <select class="form-input-google ${lockClass}" 
+                            id="field_${field.id}" 
+                            name="field_${field.id}"
+                            ${field.is_required ? 'required' : ''}
+                            ${isLocked ? 'disabled' : ''}>
+                        <option value="" disabled ${!value ? 'selected' : ''}>Choose</option>
+                        ${field.options.map(option => 
+                            `<option value="${option}" ${value === option ? 'selected' : ''}>${option}</option>`
+                        ).join('')}
+                    </select>
+                `;
+                break;
+                
+            case 'radio':
+                fieldHtml += `
+                    <div class="d-grid gap-2">
+                        ${field.options.map((option, index) => `
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="radio" 
+                                       name="field_${field.id}" 
+                                       id="field_${field.id}_${index}" 
+                                       value="${option}"
+                                       ${value === option ? 'checked' : ''}
+                                       ${isLocked ? 'disabled' : ''}>
+                                <label class="form-check-label" for="field_${field.id}_${index}">
+                                    ${option}
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                break;
+                
+            case 'checkbox':
+                const selectedValues = Array.isArray(value) ? value : (value ? [value] : []);
+                fieldHtml += `
+                    <div class="d-grid gap-2">
+                        ${field.options.map((option, index) => `
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       name="field_${field.id}" 
+                                       id="field_${field.id}_${index}" 
+                                       value="${option}"
+                                       ${selectedValues.includes(option) ? 'checked' : ''}
+                                       ${isLocked ? 'disabled' : ''}>
+                                <label class="form-check-label" for="field_${field.id}_${index}">
+                                    ${option}
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                break;
+        }
+        
+        fieldHtml += `
+                </div>
+            </div>
+        `;
+        
+        return fieldHtml;
+    }
+    
+    // Show user avatars in a Google-style way
+    function renderUserAvatar(user, isEditing = false) {
+        const statusClass = isEditing ? 'status-editing' : 'status-online';
+        return `
+            <div class="d-flex align-items-center mb-2" data-user-id="${user.id}">
+                <div class="user-avatar me-2">${user.username.charAt(0).toUpperCase()}</div>
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center">
+                        <span class="status-indicator ${statusClass}"></span>
+                        <span class="small fw-medium">${user.username}</span>
+                    </div>
+                    <div class="text-muted" style="font-size: 11px;">
+                        ${isEditing ? 'Currently editing' : 'Active'}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>
