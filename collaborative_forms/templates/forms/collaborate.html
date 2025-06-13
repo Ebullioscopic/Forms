@@ -3,48 +3,87 @@
 {% block title %}{{ form.title }} - Collaborative Form{% endblock %}
 
 {% block content %}
-<div class="gradient-bg">
-    <div class="container py-5">
-        <!-- Active Users Display -->
-        <div class="active-users">
-            <div class="card card-custom p-3">
-                <h6 class="mb-2">Active Users</h6>
-                <div id="active-users-list" class="d-flex flex-wrap gap-2"></div>
+<div class="page-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-users text-primary me-2"></i>
+                    <span class="badge bg-light text-dark border">Live Collaboration</span>
+                </div>
+                <h1 class="h3 mb-1">{{ form.title }}</h1>
+                {% if form.description %}
+                    <p class="text-muted mb-0">{{ form.description }}</p>
+                {% endif %}
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="d-flex align-items-center justify-content-md-end">
+                    <span class="text-muted me-2">Share Code:</span>
+                    <code class="bg-light px-2 py-1 rounded">{{ share_code }}</code>
+                </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card card-custom">
-                    <div class="card-body p-5">
-                        <div class="text-center mb-4">
-                            <h1 class="h2 mb-3">{{ form.title }}</h1>
-                            {% if form.description %}
-                                <p class="text-muted">{{ form.description }}</p>
-                            {% endif %}
-                            <div class="badge bg-success mb-3">
-                                <i class="fas fa-share-alt me-1"></i>
-                                Code: {{ share_code }}
-                            </div>
+<div class="container py-4">
+    <!-- Active Users Panel -->
+    <div class="active-users-panel d-none d-lg-block">
+        <div class="card-modern p-3">
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-circle text-success me-2"></i>
+                <h6 class="mb-0 text-muted">Active Now</h6>
+            </div>
+            <div id="active-users-list"></div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Connection Status -->
+            <div id="connection-status" class="connection-status connection-connecting">
+                <i class="fas fa-spinner fa-spin me-2"></i>
+                Connecting...
+            </div>
+
+            <!-- Mobile Active Users -->
+            <div class="d-lg-none mb-3">
+                <div class="card-modern p-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-users text-muted me-2"></i>
+                            <span class="text-muted">Active users:</span>
                         </div>
-
-                        <div id="connection-status" class="alert alert-info">
-                            <i class="fas fa-spinner fa-spin me-2"></i>
-                            Connecting to collaboration server...
-                        </div>
-
-                        <form id="collaborative-form">
-                            <div id="form-fields"></div>
-                            
-                            <div class="text-center mt-4">
-                                <button type="button" class="btn btn-gradient btn-lg px-5" id="save-response">
-                                    <i class="fas fa-save me-2"></i>
-                                    Save Response
-                                </button>
-                            </div>
-                        </form>
+                        <div id="active-users-mobile"></div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="form-section">
+                <div class="p-4 border-bottom">
+                    <h2 class="h4 mb-1">{{ form.title }}</h2>
+                    {% if form.description %}
+                        <p class="text-muted mb-0">{{ form.description }}</p>
+                    {% endif %}
+                </div>
+
+                <form id="collaborative-form">
+                    <div id="form-fields"></div>
+                    
+                    <div class="p-4 border-top bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted small">
+                                <i class="fas fa-save me-1"></i>
+                                Changes are saved automatically
+                            </div>
+                            <button type="button" class="btn btn-primary-modern" id="save-response">
+                                <i class="fas fa-check me-2"></i>
+                                Submit Response
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -53,10 +92,11 @@
 <!-- Field Lock Modal -->
 <div class="modal fade" id="fieldLockModal" tabindex="-1">
     <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <i class="fas fa-lock text-warning fa-2x mb-3"></i>
-                <p>This field is being edited by another user.</p>
+        <div class="modal-content border-0 shadow">
+            <div class="modal-body text-center p-4">
+                <i class="fas fa-edit text-warning fa-2x mb-3"></i>
+                <h6 class="mb-2">Field in Use</h6>
+                <p class="text-muted mb-0">Another user is currently editing this field.</p>
             </div>
         </div>
     </div>
@@ -72,6 +112,7 @@ class CollaborativeForm {
         this.formData = {};
         this.activeUsers = new Map();
         this.fieldLocks = new Map();
+        this.connectionStatus = document.getElementById('connection-status');
         this.init();
     }
 
@@ -84,14 +125,11 @@ class CollaborativeForm {
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${protocol}//${window.location.host}/ws/forms/${this.shareCode}/`;
         
+        this.updateConnectionStatus('connecting');
         this.socket = new WebSocket(wsUrl);
         
         this.socket.onopen = () => {
-            document.getElementById('connection-status').innerHTML = `
-                <i class="fas fa-check-circle text-success me-2"></i>
-                Connected! You can now collaborate in real-time.
-            `;
-            document.getElementById('connection-status').className = 'alert alert-success';
+            this.updateConnectionStatus('connected');
         };
         
         this.socket.onmessage = (event) => {
@@ -100,17 +138,46 @@ class CollaborativeForm {
         };
         
         this.socket.onclose = () => {
-            document.getElementById('connection-status').innerHTML = `
-                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                Connection lost. Attempting to reconnect...
-            `;
-            document.getElementById('connection-status').className = 'alert alert-warning';
+            this.updateConnectionStatus('disconnected');
             setTimeout(() => this.connect(), 3000);
         };
         
         this.socket.onerror = (error) => {
             console.error('WebSocket error:', error);
+            this.updateConnectionStatus('disconnected');
         };
+    }
+
+    updateConnectionStatus(status) {
+        const statusMap = {
+            connecting: {
+                class: 'connection-connecting',
+                icon: 'fas fa-spinner fa-spin',
+                text: 'Connecting...'
+            },
+            connected: {
+                class: 'connection-connected',
+                icon: 'fas fa-check-circle',
+                text: 'Connected'
+            },
+            disconnected: {
+                class: 'connection-disconnected',
+                icon: 'fas fa-exclamation-triangle',
+                text: 'Disconnected'
+            }
+        };
+
+        const config = statusMap[status];
+        this.connectionStatus.className = `connection-status ${config.class}`;
+        this.connectionStatus.innerHTML = `<i class="${config.icon} me-2"></i>${config.text}`;
+
+        if (status === 'connected') {
+            setTimeout(() => {
+                this.connectionStatus.style.opacity = '0.7';
+            }, 2000);
+        } else {
+            this.connectionStatus.style.opacity = '1';
+        }
     }
 
     handleMessage(data) {
@@ -129,9 +196,11 @@ class CollaborativeForm {
                 break;
             case 'user_joined':
                 this.addActiveUser(data.user);
+                this.showNotification(`${data.user.username} joined`, 'success');
                 break;
             case 'user_left':
                 this.removeActiveUser(data.user);
+                this.showNotification(`${data.user.username} left`, 'info');
                 break;
         }
     }
@@ -141,44 +210,49 @@ class CollaborativeForm {
         const fieldsContainer = document.getElementById('form-fields');
         fieldsContainer.innerHTML = '';
 
-        data.form.fields.forEach(field => {
-            const fieldHtml = this.createFieldHtml(field, data.response_data[field.id] || '');
+        data.form.fields.forEach((field, index) => {
+            const fieldHtml = this.createFieldHtml(field, data.response_data[field.id] || '', index);
             fieldsContainer.appendChild(fieldHtml);
         });
 
-        // Update active users
         data.active_users.forEach(user => this.addActiveUser(user));
-        
-        // Set field locks
         data.field_locks.forEach(lock => this.lockField(lock.field_id, lock.locked_by));
     }
 
-    createFieldHtml(field, value) {
-        const div = document.createElement('div');
-        div.className = 'mb-4';
+    createFieldHtml(field, value, index) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'form-field-wrapper fade-in';
+        wrapper.style.animationDelay = `${index * 0.1}s`;
         
         let inputHtml = '';
-        const requiredAttr = field.required ? 'required' : '';
-        const requiredMark = field.required ? '<span class="text-danger">*</span>' : '';
+        const requiredMark = field.required ? '<span class="text-danger ms-1">*</span>' : '';
         
         switch(field.type) {
             case 'text':
             case 'email':
             case 'number':
                 inputHtml = `
-                    <div class="form-floating">
-                        <input type="${field.type}" class="form-control" id="${field.id}" 
-                               value="${value}" ${requiredAttr} placeholder="${field.label}">
-                        <label for="${field.id}">${field.label} ${requiredMark}</label>
+                    <div class="form-floating-modern mb-0">
+                        <input type="${field.type}" class="form-control form-control-modern" 
+                               id="${field.id}" value="${value}" 
+                               ${field.required ? 'required' : ''} placeholder="${field.label}">
+                        <label for="${field.id}" class="d-flex align-items-center">
+                            <i class="fas fa-${this.getFieldIcon(field.type)} me-2 text-muted"></i>
+                            ${field.label}${requiredMark}
+                        </label>
                     </div>
                 `;
                 break;
             case 'textarea':
                 inputHtml = `
-                    <div class="form-floating">
-                        <textarea class="form-control" id="${field.id}" ${requiredAttr} 
-                                style="height: 100px" placeholder="${field.label}">${value}</textarea>
-                        <label for="${field.id}">${field.label} ${requiredMark}</label>
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label d-flex align-items-center">
+                            <i class="fas fa-align-left me-2 text-muted"></i>
+                            ${field.label}${requiredMark}
+                        </label>
+                        <textarea class="form-control form-control-modern" id="${field.id}" 
+                                rows="4" ${field.required ? 'required' : ''} 
+                                placeholder="Enter your response...">${value}</textarea>
                     </div>
                 `;
                 break;
@@ -187,47 +261,70 @@ class CollaborativeForm {
                     `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`
                 ).join('');
                 inputHtml = `
-                    <div class="form-floating">
-                        <select class="form-select" id="${field.id}" ${requiredAttr}>
-                            <option value="">Choose...</option>
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label d-flex align-items-center">
+                            <i class="fas fa-list me-2 text-muted"></i>
+                            ${field.label}${requiredMark}
+                        </label>
+                        <select class="form-select form-control-modern" id="${field.id}" 
+                                ${field.required ? 'required' : ''}>
+                            <option value="">Choose an option...</option>
                             ${options}
                         </select>
-                        <label for="${field.id}">${field.label} ${requiredMark}</label>
                     </div>
                 `;
                 break;
             case 'checkbox':
                 inputHtml = `
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="${field.id}" 
-                               ${value ? 'checked' : ''} ${requiredAttr}>
-                        <label class="form-check-label" for="${field.id}">
-                            ${field.label} ${requiredMark}
+                    <div class="form-check d-flex align-items-center">
+                        <input class="form-check-input me-3" type="checkbox" id="${field.id}" 
+                               ${value ? 'checked' : ''} ${field.required ? 'required' : ''}>
+                        <label class="form-check-label d-flex align-items-center" for="${field.id}">
+                            <i class="fas fa-check-square me-2 text-muted"></i>
+                            ${field.label}${requiredMark}
                         </label>
                     </div>
                 `;
                 break;
             case 'radio':
-                const radioOptions = field.options.map(opt => `
+                const radioOptions = field.options.map((opt, idx) => `
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="${field.id}" 
-                               id="${field.id}_${opt}" value="${opt}" ${value === opt ? 'checked' : ''}>
-                        <label class="form-check-label" for="${field.id}_${opt}">
+                               id="${field.id}_${idx}" value="${opt}" ${value === opt ? 'checked' : ''}>
+                        <label class="form-check-label" for="${field.id}_${idx}">
                             ${opt}
                         </label>
                     </div>
                 `).join('');
                 inputHtml = `
-                    <fieldset>
-                        <legend class="form-label">${field.label} ${requiredMark}</legend>
-                        ${radioOptions}
-                    </fieldset>
+                    <div class="mb-3">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="fas fa-dot-circle me-2 text-muted"></i>
+                            ${field.label}${requiredMark}
+                        </label>
+                        <div class="ms-4">
+                            ${radioOptions}
+                        </div>
+                    </div>
                 `;
                 break;
         }
         
-        div.innerHTML = inputHtml;
-        return div;
+        wrapper.innerHTML = inputHtml;
+        return wrapper;
+    }
+
+    getFieldIcon(type) {
+        const icons = {
+            'text': 'font',
+            'email': 'envelope',
+            'number': 'hashtag',
+            'textarea': 'align-left',
+            'dropdown': 'list',
+            'checkbox': 'check-square',
+            'radio': 'dot-circle'
+        };
+        return icons[type] || 'font';
     }
 
     setupEventListeners() {
@@ -293,7 +390,6 @@ class CollaborativeForm {
             element.value = value;
         }
         
-        // Show temporary indicator
         this.showFieldUpdate(element, user);
     }
 
@@ -304,6 +400,15 @@ class CollaborativeForm {
             element.classList.add('field-locked');
             element.disabled = true;
             element.title = `Being edited by ${user.username}`;
+            
+            // Add visual indicator
+            const indicator = document.createElement('div');
+            indicator.className = 'position-absolute top-0 end-0 p-1';
+            indicator.innerHTML = `<i class="fas fa-edit text-warning"></i>`;
+            indicator.style.marginTop = '-5px';
+            indicator.style.marginRight = '-5px';
+            element.parentElement.style.position = 'relative';
+            element.parentElement.appendChild(indicator);
         }
     }
 
@@ -314,6 +419,10 @@ class CollaborativeForm {
             element.classList.remove('field-locked');
             element.disabled = false;
             element.title = '';
+            
+            // Remove visual indicator
+            const indicator = element.parentElement.querySelector('.position-absolute');
+            if (indicator) indicator.remove();
         }
     }
 
@@ -329,45 +438,89 @@ class CollaborativeForm {
 
     updateActiveUsersList() {
         const container = document.getElementById('active-users-list');
-        container.innerHTML = '';
+        const mobileContainer = document.getElementById('active-users-mobile');
         
-        this.activeUsers.forEach(user => {
-            const userEl = document.createElement('div');
-            userEl.className = 'user-avatar pulse';
-            userEl.style.backgroundColor = user.avatar_color;
-            userEl.textContent = user.username.charAt(0).toUpperCase();
-            userEl.title = user.username;
-            container.appendChild(userEl);
-        });
+        const renderUsers = (target) => {
+            target.innerHTML = '';
+            this.activeUsers.forEach(user => {
+                const userEl = document.createElement('div');
+                userEl.className = 'd-flex align-items-center mb-2';
+                userEl.innerHTML = `
+                    <div class="user-avatar me-2" style="width: 28px; height: 28px; font-size: 12px;">
+                        ${user.username.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="small fw-medium">${user.username}</div>
+                        <div class="text-muted" style="font-size: 11px;">
+                            <span class="status-indicator status-online"></span>Active
+                        </div>
+                    </div>
+                `;
+                target.appendChild(userEl);
+            });
+        };
+
+        if (container) renderUsers(container);
+        if (mobileContainer) {
+            mobileContainer.innerHTML = '';
+            this.activeUsers.forEach(user => {
+                const userEl = document.createElement('div');
+                userEl.className = 'user-avatar me-1';
+                userEl.style.width = '28px';
+                userEl.style.height = '28px';
+                userEl.style.fontSize = '12px';
+                userEl.textContent = user.username.charAt(0).toUpperCase();
+                userEl.title = user.username;
+                mobileContainer.appendChild(userEl);
+            });
+        }
     }
 
     showFieldUpdate(element, user) {
         const indicator = document.createElement('div');
-        indicator.className = 'position-absolute bg-primary text-white px-2 py-1 rounded small';
-        indicator.style.cssText = 'top: -30px; right: 0; z-index: 1000; font-size: 11px;';
-        indicator.textContent = `Updated by ${user.username}`;
+        indicator.className = 'position-absolute bg-primary text-white px-2 py-1 rounded-pill small';
+        indicator.style.cssText = 'top: -10px; right: 10px; z-index: 1000; font-size: 10px;';
+        indicator.textContent = `${user.username}`;
         
         element.parentElement.style.position = 'relative';
         element.parentElement.appendChild(indicator);
         
         setTimeout(() => {
-            indicator.remove();
+            indicator.style.opacity = '0';
+            setTimeout(() => indicator.remove(), 300);
         }, 2000);
+    }
+
+    showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        notification.style.cssText = 'top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; min-width: 300px;';
+        notification.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 3000);
     }
 
     saveResponse() {
         const btn = document.getElementById('save-response');
         const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+        btn.innerHTML = '<span class="loading-spinner me-2"></span>Submitting...';
         btn.disabled = true;
         
         setTimeout(() => {
-            btn.innerHTML = '<i class="fas fa-check me-2"></i>Saved!';
-            btn.className = 'btn btn-success btn-lg px-5';
+            btn.innerHTML = '<i class="fas fa-check me-2"></i>Submitted!';
+            btn.className = 'btn btn-success';
             
             setTimeout(() => {
                 btn.innerHTML = originalText;
-                btn.className = 'btn btn-gradient btn-lg px-5';
+                btn.className = 'btn btn-primary-modern';
                 btn.disabled = false;
             }, 2000);
         }, 1000);
@@ -380,7 +533,6 @@ class CollaborativeForm {
     }
 }
 
-// Initialize collaborative form
 document.addEventListener('DOMContentLoaded', () => {
     new CollaborativeForm('{{ share_code }}');
 });

@@ -3,131 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Collaborative Forms{% endblock %}</title>
+    <title>{% block title %}CollabForms{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            /* Google Forms inspired grayscale palette */
+            --primary-color: #1a73e8;
+            --primary-hover: #1565c0;
+            --secondary-color: #5f6368;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --text-muted: #9aa0a6;
+            --border-color: #dadce0;
+            --border-focus: #1a73e8;
+            --background-primary: #ffffff;
+            --background-secondary: #f8f9fa;
+            --background-tertiary: #f1f3f4;
+            --surface-color: #ffffff;
+            --shadow-light: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+            --shadow-medium: 0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
+            --shadow-heavy: 0 2px 6px 2px rgba(60,64,67,.15), 0 8px 24px 4px rgba(60,64,67,.15);
+            --success-color: #34a853;
+            --warning-color: #fbbc04;
+            --error-color: #ea4335;
         }
         
-        .gradient-bg {
-            background: var(--primary-gradient);
-            min-height: 100vh;
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
-        .card-custom {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-            background: rgba(255,255,255,0.95);
+        body {
+            background-color: var(--background-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
         }
         
-        .btn-gradient {
-            background: var(--primary-gradient);
-            border: none;
-            border-radius: 25px;
+        .navbar {
+            background: var(--surface-color) !important;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-light);
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--text-primary) !important;
+            font-size: 1.5rem;
+        }
+        
+        .card-modern {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            transition: all 0.2s ease;
+        }
+        
+        .card-modern:hover {
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .btn-primary-modern {
+            background-color: var(--primary-color);
+            border: 1px solid var(--primary-color);
             color: white;
-            transition: transform 0.3s ease;
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 10px 24px;
+            transition: all 0.2s ease;
         }
         
-        .btn-gradient:hover {
-            transform: translateY(-2px);
+        .btn-primary-modern:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
             color: white;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .btn-secondary-modern {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 10px 24px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-secondary-modern:hover {
+            background-color: var(--background-tertiary);
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+        }
+        
+        .form-control-modern {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            background-color: var(--surface-color);
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+        
+        .form-control-modern:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+            background-color: var(--surface-color);
+        }
+        
+        .form-floating-modern > .form-control-modern {
+            padding-top: 1.625rem;
+            padding-bottom: 0.625rem;
+        }
+        
+        .form-floating-modern > label {
+            color: var(--text-secondary);
+            font-weight: 400;
         }
         
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: bold;
+            font-weight: 500;
             font-size: 14px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--text-secondary));
         }
         
         .field-locked {
-            border: 2px solid #ff6b6b;
-            background-color: #fff5f5;
+            border-color: var(--error-color) !important;
+            background-color: #fef7f0;
         }
         
-        .active-users {
+        .active-users-panel {
             position: fixed;
-            top: 20px;
+            top: 80px;
             right: 20px;
             z-index: 1000;
+            max-width: 280px;
         }
         
-        .pulse {
-            animation: pulse 2s infinite;
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .status-online { background-color: var(--success-color); }
+        .status-editing { background-color: var(--warning-color); }
+        
+        .page-header {
+            background: linear-gradient(135deg, var(--background-secondary), var(--background-tertiary));
+            border-bottom: 1px solid var(--border-color);
+            padding: 2rem 0;
         }
         
-        .form-floating > label {
-            color: #6c757d;
+        .form-section {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s ease;
         }
         
-        .navbar-brand {
-            font-weight: bold;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .form-section:hover {
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .form-field-wrapper {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--background-tertiary);
+        }
+        
+        .form-field-wrapper:last-child {
+            border-bottom: none;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            border-radius: 24px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .connection-connected {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .connection-connecting {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .connection-disconnected {
+            background-color: var(--error-color);
+            color: white;
+        }
+        
+        .dropdown-menu {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--background-tertiary);
+        }
+        
+        @media (max-width: 768px) {
+            .active-users-panel {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 1rem;
+            }
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand fs-3" href="{% url 'forms:dashboard' %}">
-                <i class="fas fa-clipboard-list me-2"></i>
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'forms:dashboard' %}">
+                <i class="fas fa-clipboard-list me-2 text-primary"></i>
                 CollabForms
             </a>
             
             <div class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
                     <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <div class="user-avatar me-2" style="background-color: {{ user.avatar_color }};">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center text-decoration-none" 
+                           href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <div class="user-avatar me-2">
                                 {{ user.username|first|upper }}
                             </div>
-                            {{ user.username }}
+                            <span class="me-1">{{ user.username }}</span>
                             {% if user.is_admin %}
                                 <span class="badge bg-primary ms-2">Admin</span>
                             {% endif %}
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'forms:dashboard' %}">
-                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'forms:dashboard' %}">
+                                <i class="fas fa-tachometer-alt me-3 text-muted"></i>Dashboard
                             </a></li>
                             {% if user.is_admin %}
-                                <li><a class="dropdown-item" href="{% url 'forms:create_form' %}">
-                                    <i class="fas fa-plus me-2"></i>Create Form
+                                <li><a class="dropdown-item d-flex align-items-center" href="{% url 'forms:create_form' %}">
+                                    <i class="fas fa-plus me-3 text-muted"></i>Create Form
                                 </a></li>
                             {% endif %}
-                            <li><a class="dropdown-item" href="{% url 'forms:join_form' %}">
-                                <i class="fas fa-sign-in-alt me-2"></i>Join Form
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'forms:join_form' %}">
+                                <i class="fas fa-sign-in-alt me-3 text-muted"></i>Join Form
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:logout' %}">
+                                <i class="fas fa-sign-out-alt me-3 text-muted"></i>Logout
                             </a></li>
                         </ul>
                     </div>
                 {% else %}
-                    <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
-                    <a class="nav-link" href="{% url 'accounts:register' %}">Register</a>
+                    <a class="nav-link text-decoration-none me-3" href="{% url 'accounts:login' %}">
+                        <i class="fas fa-sign-in-alt me-1"></i>Login
+                    </a>
+                    <a class="btn btn-primary-modern" href="{% url 'accounts:register' %}">
+                        <i class="fas fa-user-plus me-1"></i>Sign Up
+                    </a>
                 {% endif %}
             </div>
         </div>
@@ -137,8 +312,8 @@
         {% if messages %}
             <div class="container mt-3">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show fade-in" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>{{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
