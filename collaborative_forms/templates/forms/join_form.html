@@ -1,38 +1,68 @@
 {% extends 'base.html' %}
 
+{% block title %}Join form - CollabForms{% endblock %}
+
 {% block content %}
-<div class="gradient-bg">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <div class="card card-custom">
-                    <div class="card-body p-5">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-sign-in-alt fa-3x text-primary mb-3"></i>
-                            <h2 class="h3">Join a Form</h2>
-                            <p class="text-muted">Enter the share code to start collaborating</p>
+<div class="page-container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-xl-5">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="text-center">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3" style="width: 64px; height: 64px;">
+                            <i class="fas fa-sign-in-alt fa-lg text-primary"></i>
                         </div>
-
-                        <form method="post">
-                            {% csrf_token %}
-                            <div class="form-floating mb-4">
-                                <input type="text" class="form-control text-center" 
-                                       name="share_code" id="share_code" 
-                                       placeholder="Enter share code" 
-                                       style="font-size: 1.2rem; letter-spacing: 2px;"
-                                       maxlength="8" required>
-                                <label for="share_code">Share Code</label>
-                            </div>
-
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-gradient btn-lg">
-                                    <i class="fas fa-arrow-right me-2"></i>
-                                    Join Form
-                                </button>
-                            </div>
-                        </form>
+                        <h1 class="h4 mb-2">Join a form</h1>
+                        <p class="text-muted mb-0">Enter the share code to start collaborating</p>
                     </div>
                 </div>
+
+                <div class="form-card-body">
+                    {% if form.errors %}
+                        <div class="alert alert-danger mb-4">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="form-group-google">
+                            <div class="form-floating-google">
+                                <input type="text" 
+                                       class="form-input-google text-center" 
+                                       id="share_code" 
+                                       name="share_code" 
+                                       placeholder=" "
+                                       style="font-size: 18px; letter-spacing: 3px; font-weight: 500;"
+                                       maxlength="8" 
+                                       required>
+                                <label for="share_code">Share code</label>
+                            </div>
+                            <div class="form-help">Ask the form creator for the 8-character share code</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'forms:dashboard' %}" class="btn btn-google-text">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-google-primary">
+                                <i class="fas fa-arrow-right me-2"></i>Join form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help section -->
+            <div class="text-center mt-4">
+                <p class="text-muted small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Share codes are case-insensitive and exactly 8 characters long
+                </p>
             </div>
         </div>
     </div>
@@ -42,7 +72,13 @@
 {% block extra_js %}
 <script>
 document.getElementById('share_code').addEventListener('input', function(e) {
-    e.target.value = e.target.value.toUpperCase();
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+});
+
+document.getElementById('share_code').addEventListener('paste', function(e) {
+    setTimeout(() => {
+        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }, 10);
 });
 </script>
 {% endblock %}
