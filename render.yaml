@@ -17,7 +17,7 @@ services:
     runtime: python
     plan: free
     buildCommand: './build.sh'
-    startCommand: 'cd collaborative_forms && python -m gunicorn collaborative_forms.asgi:application -k uvicorn.workers.UvicornWorker'
+    startCommand: 'cd collaborative_forms && daphne collaborative_forms.asgi:application --port $PORT --bind 0.0.0.0 -v2'
     envVars:
       - key: DATABASE_URL
         fromDatabase:
