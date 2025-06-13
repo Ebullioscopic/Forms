@@ -1,17 +1,17 @@
 databases:
-  - name: collaborative-forms-db
+  - name: ebullioscopic-forms
     plan: free
-    databaseName: collaborative_forms
-    user: collaborative_forms
+    databaseName: ebullioscopic_forms
+    user: ebullioscopic_forms_user
 
 services:
   - type: redis
-    name: collaborative-forms-redis
+    name: ebullioscopic-forms-redis
     plan: free
     ipAllowList:
       - source: 0.0.0.0/0
         description: Allow all
-        
+
   - type: web
     name: collaborative-forms
     runtime: python
@@ -25,7 +25,7 @@ services:
       - key: REDIS_URL
         fromService:
           type: redis
-          name: collaborative-forms-redis
+          name: ebullioscopic-forms-redis
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
