@@ -27,8 +27,34 @@ SECRET_KEY = 'django-insecure-#!wwv)g$$n(jlqz&s(+o$hyswoe#0lgat0ferbcu_0ib8!(@bd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
 
+# Environment detection
+DEBUG = config('DEBUG', default=True, cast=bool)
+IS_PRODUCTION = not DEBUG
+
+# CSRF Configuration for Django 4+ and Render deployment
+if IS_PRODUCTION:
+    # Production CSRF settings for Render
+    CSRF_TRUSTED_ORIGINS = [
+        'https://collaborative-forms.onrender.com',
+    ]
+    
+    # Render proxy SSL configuration
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    
+    # Additional security settings for production
+    SECURE_SSL_REDIRECT = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+else:
+    # Local development CSRF settings
+    CSRF_TRUSTED_ORIGINS = [
+        'http://127.0.0.1:8000',
+        'http://localhost:8000',
+    ]
 
 # Application definition
 
@@ -119,7 +145,7 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-    
+
 # Redis Configuration
 REDIS_URL = config('REDIS_URL', default='redis://localhost:6379')
 
