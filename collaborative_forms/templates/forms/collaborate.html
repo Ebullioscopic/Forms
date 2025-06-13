@@ -22,6 +22,11 @@
             <div class="d-flex align-items-center">
                 <span class="text-muted small me-2">Share code:</span>
                 <code style="background-color: var(--background-tertiary); padding: 4px 8px; border-radius: 4px; font-size: 12px;">{{ share_code }}</code>
+                <button class="btn btn-sm p-1 ms-2" 
+                        onclick="copyToClipboard('{{ share_code }}')"
+                        title="Copy share code">
+                    <i class="fas fa-clipboard text-muted" style="font-size: 12px;"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -572,5 +577,48 @@ class CollaborativeForm {
 document.addEventListener('DOMContentLoaded', () => {
     new CollaborativeForm('{{ share_code }}');
 });
+
+function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function() {
+            showCopySuccess(event.target.closest('button'));
+        }).catch(function(err) {
+            console.error('Failed to copy: ', err);
+            fallbackCopyTextToClipboard(text);
+        });
+    } else {
+        fallbackCopyTextToClipboard(text);
+    }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showCopySuccess(event.target.closest('button'));
+    } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showCopySuccess(button) {
+    const icon = button.querySelector('i');
+    const originalClass = icon.className;
+    
+    icon.className = 'fas fa-check text-success';
+    setTimeout(() => {
+        icon.className = originalClass;
+    }, 2000);
+}
 </script>
 {% endblock %}

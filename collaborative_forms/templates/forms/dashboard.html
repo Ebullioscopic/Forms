@@ -47,6 +47,8 @@
                     </div>
                     <h3 class="h5 mb-1">Real-time</h3>
                     <p class="text-muted mb-0 small">Collaboration</p>
+                </div>
+            </div>
         </div>
         
         <div class="col-xl-3 col-lg-4 col-md-6">
@@ -146,6 +148,11 @@
                                 <span class="badge rounded-pill" style="background-color: var(--background-tertiary); color: var(--text-secondary); font-size: 11px;">
                                     {{ form.share_code }}
                                 </span>
+                                <button class="btn btn-sm p-1 ms-1" 
+                                        onclick="copyToClipboard('{{ form.share_code }}')"
+                                        title="Copy share code">
+                                    <i class="fas fa-clipboard text-muted" style="font-size: 12px;"></i>
+                                </button>
                                 <span class="text-muted ms-2" style="font-size: 12px;">
                                     {{ form.created_at|date:"M d" }}
                                 </span>
@@ -182,4 +189,49 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function() {
+            showCopySuccess(event.target.closest('button'));
+        }).catch(function(err) {
+            console.error('Failed to copy: ', err);
+            fallbackCopyTextToClipboard(text);
+        });
+    } else {
+        fallbackCopyTextToClipboard(text);
+    }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showCopySuccess(event.target.closest('button'));
+    } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showCopySuccess(button) {
+    const icon = button.querySelector('i');
+    const originalClass = icon.className;
+    
+    icon.className = 'fas fa-check text-success';
+    setTimeout(() => {
+        icon.className = originalClass;
+    }, 2000);
+}
+</script>
 {% endblock %}

@@ -203,8 +203,15 @@
                 <div class="form-card-body text-center">
                     <div class="mb-3">
                         <h6 class="mb-1">Share code</h6>
-                        <div class="d-inline-block bg-light px-3 py-2 rounded" style="font-family: monospace; font-size: 18px; letter-spacing: 2px; font-weight: 600;">
-                            {{ form_obj.share_code }}
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="d-inline-block bg-light px-3 py-2 rounded" style="font-family: monospace; font-size: 18px; letter-spacing: 2px; font-weight: 600;">
+                                {{ form_obj.share_code }}
+                            </div>
+                            <button class="btn btn-sm p-2 ms-2" 
+                                    onclick="copyToClipboard('{{ form_obj.share_code }}')"
+                                    title="Copy share code">
+                                <i class="fas fa-clipboard text-muted"></i>
+                            </button>
                         </div>
                     </div>
                     <p class="text-muted small mb-3">Share this code with collaborators to let them join your form</p>
@@ -600,4 +607,49 @@ window.addEventListener('load', function() {
     border-color: var(--error-color);
 }
 </style>
+
+<script>
+function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(function() {
+            showCopySuccess(event.target.closest('button'));
+        }).catch(function(err) {
+            console.error('Failed to copy: ', err);
+            fallbackCopyTextToClipboard(text);
+        });
+    } else {
+        fallbackCopyTextToClipboard(text);
+    }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showCopySuccess(event.target.closest('button'));
+    } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showCopySuccess(button) {
+    const icon = button.querySelector('i');
+    const originalClass = icon.className;
+    
+    icon.className = 'fas fa-check text-success';
+    setTimeout(() => {
+        icon.className = originalClass;
+    }, 2000);
+}
+</script>
 {% endblock %}
