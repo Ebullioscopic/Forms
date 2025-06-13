@@ -13,11 +13,11 @@ services:
     name: collaborative-forms
     runtime: python
     buildCommand: './build.sh'
-    startCommand: 'python -m gunicorn collaborative_forms.asgi:application -k uvicorn.workers.UvicornWorker'
+    startCommand: 'cd collaborative_forms && python -m gunicorn collaborative_forms.asgi:application -k uvicorn.workers.UvicornWorker'
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: collaborative-forms-db
+          name: ebullioscopic-forms
           property: connectionString
       - key: REDIS_URL
         fromService:
