@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="page-header">
-    <div class="page-container">
+    <div class="page-container-wide">
         <div class="d-flex justify-content-between align-items-center py-3">
             <div class="d-flex align-items-center">
                 <div class="me-3">
@@ -27,44 +27,31 @@
     </div>
 </div>
 
-<div class="page-container py-4">
+<div class="page-container-wide py-4">
     <!-- Connection Status -->
     <div id="connection-status" class="connection-status connection-connecting">
         <i class="fas fa-spinner fa-spin me-2"></i>
         Connecting...
     </div>
 
-    <!-- Active Users Panel (Desktop) -->
-    <div class="active-users-panel d-none d-lg-block">
-        <div class="form-card">
-            <div class="form-card-body p-3">
-                <div class="d-flex align-items-center mb-2">
-                    <i class="fas fa-circle text-success me-2" style="font-size: 8px;"></i>
-                    <h6 class="mb-0 text-muted small">Active now</h6>
-                </div>
-                <div id="active-users-list"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Active Users -->
-    <div class="d-lg-none mb-3">
-        <div class="form-card">
-            <div class="form-card-body p-3">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-users text-muted me-2" style="font-size: 14px;"></i>
-                        <span class="text-muted small">Active users:</span>
+    <div class="row g-4">
+        <!-- Main Form -->
+        <div class="col-lg-8 col-xl-9">
+            <!-- Mobile Active Users -->
+            <div class="d-lg-none mb-3">
+                <div class="form-card">
+                    <div class="form-card-body p-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-users text-muted me-2" style="font-size: 14px;"></i>
+                                <span class="text-muted small">Active users:</span>
+                            </div>
+                            <div id="active-users-mobile" class="d-flex align-items-center gap-1"></div>
+                        </div>
                     </div>
-                    <div id="active-users-mobile"></div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Main Form -->
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-xl-6">
             <!-- Form Header -->
             <div class="form-card mb-4">
                 <div class="form-card-header">
@@ -94,6 +81,21 @@
                     </div>
                 </div>
             </form>
+        </div>
+
+        <!-- Active Users Panel (Desktop) -->
+        <div class="col-lg-4 col-xl-3">
+            <div class="position-sticky" style="top: 80px;">
+                <div class="form-card">
+                    <div class="form-card-body p-3">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-circle text-success me-2" style="font-size: 8px;"></i>
+                            <h6 class="mb-0 text-muted small">Active now</h6>
+                        </div>
+                        <div id="active-users-list"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -252,6 +254,19 @@ class CollaborativeForm {
                     </div>
                 `;
                 break;
+            case 'date':
+                inputHtml = `
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label d-flex align-items-center">
+                            <i class="fas fa-calendar-alt me-2 text-muted"></i>
+                            ${field.label}${requiredMark}
+                        </label>
+                        <input type="date" class="form-control form-control-modern" 
+                               id="${field.id}" value="${value}" 
+                               ${field.required ? 'required' : ''}>
+                    </div>
+                `;
+                break;
             case 'textarea':
                 inputHtml = `
                     <div class="mb-3">
@@ -284,14 +299,25 @@ class CollaborativeForm {
                 `;
                 break;
             case 'checkbox':
+                const checkboxOptions = field.options.map((opt, idx) => `
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="${field.id}" 
+                               id="${field.id}_${idx}" value="${opt}" 
+                               ${Array.isArray(value) && value.includes(opt) ? 'checked' : ''}>
+                        <label class="form-check-label" for="${field.id}_${idx}">
+                            ${opt}
+                        </label>
+                    </div>
+                `).join('');
                 inputHtml = `
-                    <div class="form-check d-flex align-items-center">
-                        <input class="form-check-input me-3" type="checkbox" id="${field.id}" 
-                               ${value ? 'checked' : ''} ${field.required ? 'required' : ''}>
-                        <label class="form-check-label d-flex align-items-center" for="${field.id}">
+                    <div class="mb-3">
+                        <label class="form-label d-flex align-items-center">
                             <i class="fas fa-check-square me-2 text-muted"></i>
                             ${field.label}${requiredMark}
                         </label>
+                        <div class="ms-4">
+                            ${checkboxOptions}
+                        </div>
                     </div>
                 `;
                 break;
@@ -328,6 +354,7 @@ class CollaborativeForm {
             'text': 'font',
             'email': 'envelope',
             'number': 'hashtag',
+            'date': 'calendar-alt',
             'textarea': 'align-left',
             'dropdown': 'list',
             'checkbox': 'check-square',

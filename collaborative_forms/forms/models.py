@@ -33,13 +33,14 @@ class Form(models.Model):
 
 class FormField(models.Model):
     FIELD_TYPES = [
-        ('text', 'Text'),
+        ('text', 'Short answer'),
+        ('textarea', 'Paragraph'),
         ('number', 'Number'),
         ('email', 'Email'),
+        ('date', 'Date'),
         ('dropdown', 'Dropdown'),
-        ('textarea', 'Textarea'),
-        ('checkbox', 'Checkbox'),
-        ('radio', 'Radio'),
+        ('radio', 'Multiple choice'),
+        ('checkbox', 'Checkboxes'),
     ]
     
     form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name='fields')
