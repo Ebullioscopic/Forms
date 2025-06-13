@@ -166,6 +166,7 @@
             outline: none;
             border-bottom: 2px solid var(--primary-color);
             background-color: #fafbfc;
+            box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
         }
         
         .form-floating-google {
@@ -242,6 +243,12 @@
         /* Page layouts */
         .page-container {
             max-width: 768px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        
+        .page-container-wide {
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 16px;
         }
@@ -373,10 +380,242 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Responsive design */
-        @media (max-width: 768px) {
+        /* Option builder styles */
+        .option-builder {
+            width: 100%;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--surface-color);
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        
+        .option-item:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .option-item .field-handle {
+            color: var(--text-muted);
+            cursor: grab;
+            padding: 4px;
+        }
+        
+        .option-item .field-handle:active {
+            cursor: grabbing;
+        }
+        
+        .option-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            color: var(--text-primary);
+            padding: 4px 0;
+        }
+        
+        .option-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .option-remove {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 4px;
+            border-radius: 3px;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            cursor: pointer;
+        }
+        
+        .option-remove:hover {
+            background-color: var(--error-color);
+            color: white;
+        }
+        
+        .option-add {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            background: transparent;
+            border: 1px dashed var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            color: var(--primary-color);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            cursor: pointer;
+            margin-top: 4px;
+        }
+        
+        .option-add:hover {
+            background-color: rgba(26, 115, 232, 0.04);
+            border-color: var(--primary-color);
+        }
+        
+        .option-add i {
+            font-size: 12px;
+        }
+        
+        /* Field type selector styles */
+        .field-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .field-type-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 16px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--surface-color);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .field-type-option:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(26, 115, 232, 0.04);
+        }
+        
+        .field-type-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(26, 115, 232, 0.08);
+            color: var(--primary-color);
+        }
+        
+        .field-type-option i {
+            font-size: 18px;
+            color: var(--text-secondary);
+            transition: color 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        
+        .field-type-option.selected i {
+            color: var(--primary-color);
+        }
+        
+        .field-type-option span {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        /* Enhanced responsive design */
+        /* Enhanced responsive design for different screen sizes */
+        
+        /* Mobile First - Base styles for small devices */
+        @media (max-width: 575.98px) {
+            .page-container {
+                padding: 0 8px;
+                max-width: 100%;
+            }
+            
+            .page-container-wide {
+                padding: 0 8px;
+                max-width: 100%;
+            }
+            
+            .auth-container {
+                padding: 8px;
+                min-height: 100vh;
+            }
+            
+            .auth-header {
+                padding: 24px 20px 16px 20px;
+            }
+            
+            .auth-body {
+                padding: 0 20px 32px 20px;
+            }
+            
+            .navbar-brand {
+                font-size: 18px;
+            }
+            
+            .form-card-body {
+                padding: 16px;
+            }
+            
+            .form-card-header {
+                padding: 16px 16px 0 16px;
+            }
+            
+            .field-type-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+            
+            .field-type-option {
+                padding: 12px 6px;
+                min-height: 70px;
+            }
+            
+            .field-type-option i {
+                font-size: 16px;
+                margin-bottom: 4px;
+            }
+            
+            .field-type-option span {
+                font-size: 10px;
+                line-height: 1.2;
+            }
+            
+            .page-header .d-flex {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 12px;
+            }
+            
+            .btn-group {
+                width: 100%;
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                flex: 1;
+                margin-left: 0;
+                margin-bottom: 4px;
+            }
+            
+            .option-item {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .option-input-wrapper {
+                flex: 1;
+                min-width: 200px;
+                margin: 0;
+            }
+        }
+        
+        /* Small devices - tablets portrait */
+        @media (min-width: 576px) and (max-width: 767.98px) {
             .page-container {
                 padding: 0 12px;
+                max-width: 540px;
+            }
+            
+            .page-container-wide {
+                padding: 0 12px;
+                max-width: 720px;
             }
             
             .auth-container {
@@ -388,88 +627,628 @@
             }
             
             .auth-body {
-                padding: 0 24px 32px 24px;
+                padding: 0 24px 40px 24px;
             }
             
-            .navbar-brand {
+            .field-type-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            
+            .field-type-option {
+                padding: 14px 8px;
+                min-height: 80px;
+            }
+            
+            .field-type-option i {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+            
+            .field-type-option span {
+                font-size: 11px;
+            }
+        }
+        
+        /* Medium devices - tablets landscape */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .page-container {
+                padding: 0 16px;
+                max-width: 720px;
+            }
+            
+            .page-container-wide {
+                padding: 0 16px;
+                max-width: 960px;
+            }
+            
+            .form-card-body {
+                padding: 20px;
+            }
+            
+            .form-card-header {
+                padding: 20px 20px 0 20px;
+            }
+            
+            .field-type-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            
+            .field-type-option {
+                padding: 16px 10px;
+                min-height: 85px;
+            }
+            
+            .field-type-option i {
                 font-size: 20px;
+                margin-bottom: 8px;
             }
             
-            .connection-status {
-                bottom: 16px;
-                right: 16px;
+            .field-type-option span {
+                font-size: 12px;
             }
         }
         
-        /* Form field specific styles */
-        .form-group-google {
-            margin-bottom: 24px;
+        /* Large devices - small laptops */
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            .page-container {
+                padding: 0 20px;
+                max-width: 960px;
+            }
+            
+            .page-container-wide {
+                padding: 0 20px;
+                max-width: 1140px;
+            }
+            
+            .field-type-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+            
+            .field-type-option {
+                padding: 18px 12px;
+                min-height: 90px;
+            }
+            
+            .field-type-option i {
+                font-size: 22px;
+                margin-bottom: 8px;
+            }
+            
+            .field-type-option span {
+                font-size: 13px;
+            }
         }
         
-        .form-error {
-            color: var(--error-color);
-            font-size: 12px;
-            margin-top: 8px;
-            margin-left: 16px;
+        /* Extra large devices - large laptops and desktops */
+        @media (min-width: 1200px) and (max-width: 1399.98px) {
+            .page-container {
+                padding: 0 24px;
+                max-width: 1140px;
+            }
+            
+            .page-container-wide {
+                padding: 0 24px;
+                max-width: 1320px;
+            }
+            
+            .field-type-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+            }
+            
+            .field-type-option {
+                padding: 20px 14px;
+                min-height: 95px;
+            }
+            
+            .field-type-option i {
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+            
+            .field-type-option span {
+                font-size: 14px;
+            }
         }
         
-        .form-help {
-            color: var(--text-secondary);
-            font-size: 12px;
-            margin-top: 8px;
-            margin-left: 16px;
+        /* Extra extra large devices - large monitors */
+        @media (min-width: 1400px) {
+            .page-container {
+                padding: 0 30px;
+                max-width: 1200px;
+            }
+            
+            .page-container-wide {
+                padding: 0 30px;
+                max-width: 1600px;
+            }
+            
+            .field-type-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+            }
+            
+            .field-type-option {
+                padding: 22px 16px;
+                min-height: 100px;
+            }
+            
+            .field-type-option i {
+                font-size: 26px;
+                margin-bottom: 12px;
+            }
+            
+            .field-type-option span {
+                font-size: 15px;
+            }
         }
         
-        
-        .field-locked {
-            border-color: var(--error-color) !important;
-            background-color: #fef7f0;
+        /* Laptop-specific fixes for alignment issues */
+        @media (min-width: 1024px) and (max-width: 1440px) and (orientation: landscape) {
+            /* Common laptop resolution fixes */
+            .row.g-4 {
+                --bs-gutter-x: 2rem;
+                --bs-gutter-y: 2rem;
+            }
+            
+            .col-xl-8, .col-lg-7 {
+                flex: 0 0 auto;
+                width: 66.66666667%;
+            }
+            
+            .col-xl-4, .col-lg-5 {
+                flex: 0 0 auto;
+                width: 33.33333333%;
+            }
+            
+            .sticky-form-panel {
+                position: sticky;
+                top: 24px;
+                height: fit-content;
+                max-height: calc(100vh - 48px);
+                overflow-y: auto;
+            }
+            
+            /* Better spacing for form elements */
+            .form-group-google {
+                margin-bottom: 1.5rem;
+            }
+            
+            .option-builder {
+                max-height: 300px;
+                overflow-y: auto;
+                border: 1px solid var(--border-color);
+                border-radius: 6px;
+                padding: 12px;
+            }
+            
+            /* Improved field item layout */
+            .field-item {
+                margin-bottom: 1rem;
+                padding: 1.25rem;
+            }
+            
+            .field-item .d-flex {
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            /* Better button alignment */
+            .d-flex.gap-2 {
+                gap: 0.75rem !important;
+            }
+            
+            .d-flex.gap-3 {
+                gap: 1rem !important;
+            }
         }
         
-        .active-users-panel {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 1000;
-            max-width: 280px;
+        /* Ultra-wide screen optimizations */
+        @media (min-width: 1920px) {
+            .page-container-wide {
+                max-width: 1800px;
+            }
+            
+            .row.g-4 {
+                --bs-gutter-x: 3rem;
+            }
+            
+            .form-card {
+                box-shadow: var(--shadow-medium);
+            }
         }
         
+        /* Height-based responsive adjustments */
+        @media (max-height: 700px) and (min-width: 992px) {
+            .sticky-form-panel {
+                position: static;
+            }
+            
+            .form-card-body {
+                padding: 16px;
+            }
+            
+            .form-group-google {
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* High DPI screen adjustments */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .form-card {
+                border-width: 0.5px;
+            }
+            
+            .option-item {
+                border-width: 0.5px;
+            }
+            
+            .field-type-option {
+                border-width: 0.5px;
+            }
+        }
+        
+        /* Additional utility classes for better alignment */
         .status-indicator {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
+            margin-right: 6px;
+            flex-shrink: 0;
         }
         
-        .status-online { background-color: var(--success-color); }
-        .status-editing { background-color: var(--warning-color); }
-        
-        .page-header {
-            background: var(--surface-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 24px 0;
+        .status-online {
+            background-color: var(--success-color);
         }
         
-        .form-section {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 24px;
+        .status-editing {
+            background-color: var(--warning-color);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* Field handle for drag and drop */
+        .field-handle {
+            color: var(--text-muted);
+            cursor: grab;
+            padding: 4px;
+            transition: color 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        
+        .field-handle:hover {
+            color: var(--text-secondary);
+        }
+        
+        .field-handle:active {
+            cursor: grabbing;
+        }
+        
+        /* Field item styles */
+        .field-item {
             transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
         }
         
-        .form-section:hover {
+        .field-item:hover {
+            box-shadow: var(--shadow-light);
+        }
+        
+        .field-item.dragging {
+            opacity: 0.7;
+            transform: rotate(5deg);
+        }
+        
+        /* Better form input focus states */
+        .form-input-google:focus {
+            outline: none;
+            border-bottom: 2px solid var(--primary-color);
+            background-color: #fafbfc;
+            box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
+        }
+        
+        /* Improved checkbox and radio styles */
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .form-check-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 0.25rem rgba(26, 115, 232, 0.25);
+        }
+        
+        /* Page header improvements */
+        .page-header {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0;
+        }
+        
+        /* Better button spacing in groups */
+        .btn-group .btn,
+        .d-flex .btn + .btn {
+            margin-left: 8px;
+        }
+        
+        /* Better form field error states */
+        .form-input-google.is-invalid {
+            border-bottom-color: var(--error-color);
+        }
+        
+        .form-input-google.is-invalid:focus {
+            border-bottom-color: var(--error-color);
+            box-shadow: 0 2px 4px rgba(234, 67, 53, 0.1);
+        }
+        
+        /* Consistent border radius */
+        .rounded {
+            border-radius: 6px !important;
+        }
+        
+        .rounded-pill {
+            border-radius: 16px !important;
+        }
+        
+        /* Enhanced option builder styles */
+        .option-list {
+            margin-bottom: 12px;
+        }
+        
+        .option-drag-handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            color: var(--text-muted);
+            cursor: grab;
+            border-radius: 3px;
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        
+        .option-drag-handle:hover {
+            background-color: var(--background-tertiary);
+            color: var(--text-secondary);
+        }
+        
+        .option-drag-handle:active {
+            cursor: grabbing;
+        }
+        
+        .option-input-wrapper {
+            flex: 1;
+            margin: 0 8px;
+        }
+        
+        .option-remove-placeholder {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .option-dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+        
+        .option-item:last-child .option-input {
+            border-bottom-color: transparent;
+        }
+        
+        .option-item .option-input:focus {
+            border-bottom-color: var(--primary-color);
+        }
+        
+        /* Field type option hover effects */
+        .field-type-option {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .field-type-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(26, 115, 232, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .field-type-option:hover::before {
+            left: 100%;
+        }
+        
+        /* Form validation styles */
+        .is-invalid .option-input {
+            border-bottom-color: var(--error-color);
+        }
+        
+        .invalid-feedback {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        
+        /* Loading state for option builder */
+        .option-builder.loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .option-builder.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Dashboard specific responsive improvements */
+        .dashboard-stats {
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-stats .form-card {
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        
+        .dashboard-stats .form-card:hover {
+            transform: translateY(-2px);
             box-shadow: var(--shadow-medium);
         }
         
-        .form-field-wrapper {
-            padding: 24px;
-            border-bottom: 1px solid var(--background-tertiary);
+        /* Forms grid responsive layout */
+        @media (min-width: 1200px) {
+            .forms-grid .col-xl-4 {
+                flex: 0 0 auto;
+                width: 33.333333%;
+            }
         }
         
-        .form-field-wrapper:last-child {
-            border-bottom: none;
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            .forms-grid .col-lg-6 {
+                flex: 0 0 auto;
+                width: 50%;
+            }
+        }
+        
+        @media (max-width: 991.98px) {
+            .forms-grid .col-md-12 {
+                flex: 0 0 auto;
+                width: 100%;
+            }
+        }
+        
+        /* Better button groups on mobile */
+        @media (max-width: 767.98px) {
+            .btn-group-mobile {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+            }
+            
+            .btn-group-mobile .btn {
+                width: 100%;
+                margin-left: 0;
+            }
+            
+            .page-header .d-flex {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 16px;
+            }
+            
+            .page-header .flex-grow-1 {
+                text-align: center;
+            }
+        }
+        
+        /* Form card improvements for different screen sizes */
+        .form-item-card {
+            transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-item-card:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-light);
+        }
+        
+        .form-item-card .form-item-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-item-card .form-item-footer {
+            margin-top: auto;
+            padding-top: 12px;
+        }
+        
+        /* Enhanced responsiveness for collaboration UI */
+        .collaboration-panel {
+            position: sticky;
+            top: 24px;
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 991.98px) {
+            .collaboration-panel {
+                position: static;
+                max-height: none;
+            }
+        }
+        
+        /* Better form field spacing on different screen sizes */
+        @media (min-width: 768px) and (max-width: 1023.98px) {
+            .form-group-google {
+                margin-bottom: 1.25rem;
+            }
+            
+            .field-type-grid {
+                gap: 8px;
+            }
+            
+            .option-builder {
+                padding: 14px;
+            }
+        }
+        
+        /* Ultra-wide screen optimizations */
+        @media (min-width: 1600px) {
+            .page-container-wide {
+                max-width: 1500px;
+            }
+            
+            .forms-grid {
+                --bs-gutter-x: 2rem;
+            }
+            
+            .dashboard-stats {
+                --bs-gutter-x: 1.5rem;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .page-header,
+            .btn,
+            .dropdown,
+            .connection-status,
+            .navbar {
+                display: none !important;
+            }
+            
+            .form-card {
+                border: 1px solid #ddd !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+            
+            .page-container,
+            .page-container-wide {
+                max-width: none !important;
+                padding: 0 !important;
+            }
         }
     </style>
     {% block extra_css %}{% endblock %}
@@ -577,6 +1356,21 @@
                 `;
                 break;
                 
+            case 'date':
+                fieldHtml += `
+                    <div class="form-floating-google">
+                        <input type="date" 
+                               class="form-input-google ${lockClass}" 
+                               id="field_${field.id}" 
+                               name="field_${field.id}" 
+                               value="${value}"
+                               ${field.is_required ? 'required' : ''}
+                               ${isLocked ? 'disabled' : ''}>
+                        <label for="field_${field.id}">Select date</label>
+                    </div>
+                `;
+                break;
+                
             case 'textarea':
                 fieldHtml += `
                     <div class="form-floating-google">
@@ -610,6 +1404,7 @@
                 break;
                 
             case 'select':
+            case 'dropdown':
                 fieldHtml += `
                     <select class="form-input-google ${lockClass}" 
                             id="field_${field.id}" 
@@ -693,6 +1488,234 @@
                 </div>
             </div>
         `;
+    }
+    
+    // Mobile user avatar rendering
+    function renderMobileUserAvatar(user, isEditing = false) {
+        const statusClass = isEditing ? 'status-editing' : 'status-online';
+        return `
+            <div class="user-avatar" 
+                 data-user-id="${user.id}" 
+                 title="${user.username} - ${isEditing ? 'Currently editing' : 'Active'}"
+                 style="position: relative;">
+                ${user.username.charAt(0).toUpperCase()}
+                <span class="status-indicator ${statusClass}" 
+                      style="position: absolute; bottom: -2px; right: -2px; border: 1px solid white;"></span>
+            </div>
+        `;
+    }
+    
+    // Option builder functionality
+    window.optionBuilders = {};
+    
+    function createOptionBuilder(containerId, initialOptions = []) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        const options = initialOptions.length > 0 ? initialOptions : ['Option 1'];
+        let optionCounter = options.length;
+        
+        function renderOptions() {
+            container.innerHTML = `
+                <div class="option-builder">
+                    <div class="mb-3">
+                        <label class="form-label small text-muted mb-2">Options</label>
+                        <div class="option-list" id="option-list-${containerId}">
+                            ${options.map((option, index) => `
+                                <div class="option-item" data-index="${index}">
+                                    <div class="option-drag-handle">
+                                        <i class="fas fa-grip-vertical"></i>
+                                    </div>
+                                    <div class="option-input-wrapper">
+                                        <input type="text" 
+                                               class="option-input" 
+                                               value="${option}" 
+                                               placeholder="Enter option text..."
+                                               onchange="updateOption('${containerId}', ${index}, this.value)"
+                                               onkeydown="handleOptionKeydown(event, '${containerId}', ${index})">
+                                    </div>
+                                    ${options.length > 1 ? `
+                                        <button type="button" 
+                                                class="option-remove" 
+                                                onclick="removeOption('${containerId}', ${index})"
+                                                title="Remove option">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    ` : `
+                                        <div class="option-remove-placeholder"></div>
+                                    `}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button type="button" 
+                                class="option-add" 
+                                onclick="addOption('${containerId}')"
+                                title="Add new option">
+                            <i class="fas fa-plus"></i>
+                            <span>Add option</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Initialize drag and drop for options
+            initializeOptionSorting(containerId);
+        }
+        
+        window.updateOption = function(builderId, index, value) {
+            if (window.optionBuilders[builderId]) {
+                window.optionBuilders[builderId].options[index] = value;
+                window.optionBuilders[builderId].updateHiddenInput();
+            }
+        };
+        
+        window.removeOption = function(builderId, index) {
+            if (window.optionBuilders[builderId] && window.optionBuilders[builderId].options.length > 1) {
+                window.optionBuilders[builderId].options.splice(index, 1);
+                window.optionBuilders[builderId].renderOptions();
+                window.optionBuilders[builderId].updateHiddenInput();
+            }
+        };
+        
+        window.addOption = function(builderId) {
+            if (window.optionBuilders[builderId]) {
+                const builder = window.optionBuilders[builderId];
+                builder.optionCounter++;
+                builder.options.push(`Option ${builder.optionCounter}`);
+                builder.renderOptions();
+                
+                // Focus on the new input
+                setTimeout(() => {
+                    const inputs = document.querySelectorAll(`#${builderId} .option-input`);
+                    const newInput = inputs[inputs.length - 1];
+                    if (newInput) {
+                        newInput.focus();
+                        newInput.select();
+                    }
+                }, 100);
+                
+                builder.updateHiddenInput();
+            }
+        };
+        
+        window.handleOptionKeydown = function(event, builderId, index) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addOption(builderId);
+            } else if (event.key === 'Backspace' && event.target.value === '' && window.optionBuilders[builderId].options.length > 1) {
+                event.preventDefault();
+                removeOption(builderId, index);
+                // Focus on previous input if available
+                setTimeout(() => {
+                    const inputs = document.querySelectorAll(`#${builderId} .option-input`);
+                    const prevInput = inputs[Math.max(0, index - 1)];
+                    if (prevInput) {
+                        prevInput.focus();
+                    }
+                }, 100);
+            }
+        };
+        
+        function updateHiddenInput() {
+            const hiddenInput = document.querySelector('[name="options_text"]');
+            if (hiddenInput) {
+                hiddenInput.value = options.filter(opt => opt.trim()).join('\n');
+            }
+        }
+        
+        function initializeOptionSorting(builderId) {
+            const optionList = document.getElementById(`option-list-${builderId}`);
+            if (optionList && window.Sortable) {
+                new Sortable(optionList, {
+                    handle: '.option-drag-handle',
+                    animation: 150,
+                    ghostClass: 'option-dragging',
+                    onEnd: function(evt) {
+                        const builder = window.optionBuilders[builderId];
+                        if (builder) {
+                            // Reorder the options array
+                            const movedOption = builder.options.splice(evt.oldIndex, 1)[0];
+                            builder.options.splice(evt.newIndex, 0, movedOption);
+                            builder.updateHiddenInput();
+                        }
+                    }
+                });
+            }
+        }
+        
+        renderOptions();
+        updateHiddenInput();
+        
+        window.optionBuilders[containerId] = {
+            options,
+            optionCounter,
+            renderOptions,
+            updateHiddenInput
+        };
+    }
+    
+    // Field type selector functionality
+    function createFieldTypeSelector(containerId, selectedType = '') {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        const fieldTypes = [
+            { value: 'text', label: 'Short answer', icon: 'fas fa-font', description: 'Single line text input' },
+            { value: 'textarea', label: 'Paragraph', icon: 'fas fa-align-left', description: 'Multi-line text input' },
+            { value: 'radio', label: 'Multiple choice', icon: 'fas fa-circle-dot', description: 'Select one option' },
+            { value: 'checkbox', label: 'Checkboxes', icon: 'fas fa-check-square', description: 'Select multiple options' },
+            { value: 'dropdown', label: 'Dropdown', icon: 'fas fa-caret-down', description: 'Select from dropdown list' },
+            { value: 'number', label: 'Number', icon: 'fas fa-hashtag', description: 'Numeric input' },
+            { value: 'email', label: 'Email', icon: 'fas fa-envelope', description: 'Email address input' },
+            { value: 'date', label: 'Date', icon: 'fas fa-calendar-alt', description: 'Date picker input' }
+        ];
+        
+        container.innerHTML = `
+            <div class="field-type-grid">
+                ${fieldTypes.map(type => `
+                    <div class="field-type-option ${selectedType === type.value ? 'selected' : ''}" 
+                         data-type="${type.value}"
+                         onclick="selectFieldType('${type.value}')"
+                         title="${type.description}">
+                        <i class="${type.icon}"></i>
+                        <span>${type.label}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        window.selectFieldType = function(type) {
+            // Update visual selection
+            container.querySelectorAll('.field-type-option').forEach(option => {
+                option.classList.toggle('selected', option.dataset.type === type);
+            });
+            
+            // Update hidden select
+            const hiddenSelect = document.querySelector('[name="field_type"]');
+            if (hiddenSelect) {
+                hiddenSelect.value = type;
+            }
+            
+            // Show/hide options builder based on field type
+            const optionsContainer = document.getElementById('options-builder');
+            const needsOptions = ['radio', 'checkbox', 'dropdown'].includes(type);
+            if (optionsContainer) {
+                optionsContainer.style.display = needsOptions ? 'block' : 'none';
+                
+                // Initialize or update option builder if needed
+                if (needsOptions) {
+                    const builderContainer = document.getElementById('options-container');
+                    if (builderContainer && !window.optionBuilders['options-container']) {
+                        createOptionBuilder('options-container');
+                    }
+                }
+            }
+        };
+        
+        // Auto-select first option if none selected
+        if (!selectedType) {
+            selectFieldType('text');
+        }
     }
     </script>
     

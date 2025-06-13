@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="page-header">
-    <div class="page-container">
+    <div class="page-container-wide">
         <div class="d-flex justify-content-between align-items-center py-3">
             <div>
                 <h1 class="h4 mb-1">{{ form_obj.title }}</h1>
@@ -22,50 +22,80 @@
     </div>
 </div>
 
-<div class="page-container py-4">
+<div class="page-container-wide py-4">
     <div class="row g-4">
         <!-- Form Fields Section -->
-        <div class="col-lg-8">
+        <div class="col-xl-8 col-lg-7 col-md-12">
             <div class="form-card">
                 <div class="form-card-header">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <h2 class="h5 mb-0">Form fields</h2>
-                        <span class="text-muted small">{{ fields|length }} field{{ fields|length|pluralize }}</span>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="text-muted small">{{ fields|length }} field{{ fields|length|pluralize }}</span>
+                            <div class="dropdown d-md-none">
+                                <button class="btn btn-google-text btn-sm" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-plus me-1"></i>Add field
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 300px;">
+                                    <div id="mobile-field-form">
+                                        <!-- Mobile form will be inserted here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="form-card-body">
                     {% if fields %}
-                        <div class="d-grid gap-3">
+                        <div class="d-grid gap-3" id="fields-container">
                             {% for field in fields %}
-                            <div class="border rounded p-3" style="border-color: var(--border-color) !important; background-color: #fafbfc;">
+                            <div class="field-item border rounded p-3" style="border-color: var(--border-color) !important; background-color: #fafbfc;" data-field-id="{{ field.id }}">
                                 <div class="d-flex justify-content-between align-items-start">
-                                    <div class="flex-grow-1">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <h6 class="mb-0 me-2">{{ field.label }}</h6>
-                                            <span class="badge rounded-pill" style="background-color: var(--background-tertiary); color: var(--text-secondary); font-size: 10px;">
-                                                {{ field.get_field_type_display }}
-                                            </span>
-                                            {% if field.is_required %}
-                                                <span class="badge rounded-pill ms-1" style="background-color: var(--error-color); color: white; font-size: 10px;">
-                                                    Required
+                                    <div class="d-flex align-items-start gap-3 flex-grow-1">
+                                        <div class="field-handle mt-1">
+                                            <i class="fas fa-grip-vertical"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center mb-2 flex-wrap gap-2">
+                                                <h6 class="mb-0 me-2">{{ field.label }}</h6>
+                                                <span class="badge rounded-pill" style="background-color: var(--background-tertiary); color: var(--text-secondary); font-size: 10px;">
+                                                    {{ field.get_field_type_display }}
                                                 </span>
+                                                {% if field.is_required %}
+                                                    <span class="badge rounded-pill" style="background-color: var(--error-color); color: white; font-size: 10px;">
+                                                        Required
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                            {% if field.field_type == 'radio' or field.field_type == 'checkbox' or field.field_type == 'dropdown' %}
+                                                {% if field.options %}
+                                                    <div class="text-muted small">
+                                                        <strong>Options:</strong> 
+                                                        <span class="d-inline-block">
+                                                            {% for option in field.options %}
+                                                                <span class="badge bg-light text-dark me-1">{{ option }}</span>
+                                                            {% endfor %}
+                                                        </span>
+                                                    </div>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
-                                        {% if field.field_type == 'radio' or field.field_type == 'checkbox' or field.field_type == 'select' %}
-                                            {% if field.options %}
-                                                <div class="text-muted small">
-                                                    Options: {{ field.options|join:", " }}
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
                                     </div>
-                                    <button class="btn btn-sm" 
-                                            style="color: var(--text-secondary);" 
-                                            onclick="deleteField({{ field.id }})"
-                                            title="Delete field">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button class="btn btn-sm" 
+                                                style="color: var(--text-secondary);" 
+                                                onclick="editField({{ field.id }})"
+                                                title="Edit field">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm" 
+                                                style="color: var(--text-secondary);" 
+                                                onclick="deleteField({{ field.id }})"
+                                                title="Delete field">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             {% endfor %}
@@ -84,26 +114,35 @@
         </div>
         
         <!-- Add Field Section -->
-        <div class="col-lg-4">
-            <div class="form-card">
+        <div class="col-xl-4 col-lg-5 col-md-12">
+            <div class="form-card sticky-form-panel">
                 <div class="form-card-header">
-                    <h3 class="h6 mb-0">Add new field</h3>
+                    <h3 class="h6 mb-0">
+                        <i class="fas fa-plus-circle me-2 text-primary"></i>
+                        Add new field
+                    </h3>
                 </div>
                 
                 <div class="form-card-body">
                     {% if field_form.errors %}
-                        <div class="alert alert-danger mb-3">
+                        <div class="alert alert-danger mb-3" role="alert">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Please fix the following errors:</strong>
+                            </div>
                             {% for field, errors in field_form.errors.items %}
                                 {% for error in errors %}
-                                    <div>{{ error }}</div>
+                                    <div class="small">• {{ error }}</div>
                                 {% endfor %}
                             {% endfor %}
                         </div>
                     {% endif %}
                     
-                    <form method="post" novalidate>
+                    <form method="post" novalidate id="field-form" class="needs-validation">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="add_field">
+                        <input type="hidden" name="field_type" id="field_type" value="" required>
+                        <input type="hidden" name="options_text" id="options_text" value="">
                         
                         <div class="form-group-google">
                             <div class="form-floating-google">
@@ -113,53 +152,48 @@
                                        name="{{ field_form.label.name }}" 
                                        placeholder=" "
                                        value="{{ field_form.label.value|default:'' }}"
+                                       maxlength="200"
                                        required>
-                                <label for="{{ field_form.label.id_for_label }}">Field label</label>
+                                <label for="{{ field_form.label.id_for_label }}">Field label *</label>
                             </div>
+                            <div class="form-help">Enter a clear and descriptive label for this field</div>
                         </div>
                         
                         <div class="form-group-google">
-                            <div class="form-floating-google">
-                                <select class="form-input-google" 
-                                        id="{{ field_form.field_type.id_for_label }}" 
-                                        name="{{ field_form.field_type.name }}" 
-                                        required>
-                                    <option value="" disabled selected></option>
-                                    {% for value, label in field_form.field_type.field.choices %}
-                                        <option value="{{ value }}" {% if field_form.field_type.value == value %}selected{% endif %}>{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                                <label for="{{ field_form.field_type.id_for_label }}">Field type</label>
-                            </div>
+                            <label class="form-label small text-muted mb-2">Field type *</label>
+                            <div id="field-type-selector"></div>
+                            <div class="form-help">Select the type of input field</div>
+                        </div>
+                        
+                        <div class="form-group-google" id="options-builder" style="display: none;">
+                            <div id="options-container"></div>
+                            <div class="form-help">Add options for users to choose from</div>
                         </div>
                         
                         <div class="form-group-google">
-                            <div class="form-floating-google">
-                                <textarea class="form-input-google" 
-                                          id="{{ field_form.options_text.id_for_label }}" 
-                                          name="{{ field_form.options_text.name }}" 
-                                          placeholder=" "
-                                          rows="3"
-                                          style="min-height: 80px; resize: vertical;">{{ field_form.options_text.value|default:'' }}</textarea>
-                                <label for="{{ field_form.options_text.id_for_label }}">Options (one per line)</label>
+                            <div class="form-check">
+                                <input type="checkbox" 
+                                       class="form-check-input" 
+                                       id="{{ field_form.is_required.id_for_label }}" 
+                                       name="{{ field_form.is_required.name }}"
+                                       {% if field_form.is_required.value %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ field_form.is_required.id_for_label }}">
+                                    <strong>Required field</strong>
+                                    <div class="small text-muted">Users must fill this field to submit the form</div>
+                                </label>
                             </div>
-                            <div class="form-help">Required for radio buttons, checkboxes, and dropdowns</div>
                         </div>
                         
-                        <div class="d-flex align-items-center mb-4">
-                            <input type="checkbox" 
-                                   class="form-check-input me-2" 
-                                   id="{{ field_form.is_required.id_for_label }}" 
-                                   name="{{ field_form.is_required.name }}"
-                                   {% if field_form.is_required.value %}checked{% endif %}>
-                            <label class="form-check-label small" for="{{ field_form.is_required.id_for_label }}">
-                                Required field
-                            </label>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-google-primary" id="add-field-btn">
+                                <i class="fas fa-plus me-2"></i>
+                                <span>Add field</span>
+                                <span class="loading-spinner ms-2" style="display: none;"></span>
+                            </button>
+                            <button type="button" class="btn btn-google-text btn-sm" onclick="resetForm()">
+                                <i class="fas fa-refresh me-1"></i>Clear form
+                            </button>
                         </div>
-                        
-                        <button type="submit" class="btn btn-google-primary w-100">
-                            <i class="fas fa-plus me-2"></i>Add field
-                        </button>
                     </form>
                 </div>
             </div>
@@ -188,43 +222,382 @@
 
 {% block extra_js %}
 <script>
-function deleteField(fieldId) {
-    if (confirm('Are you sure you want to delete this field? This action cannot be undone.')) {
-        fetch(`/forms/api/fields/${fieldId}/delete/`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'Content-Type': 'application/json'
+// Initialize the field type selector and option builder
+document.addEventListener('DOMContentLoaded', function() {
+    initializeFormBuilder();
+    initializeFieldSorting();
+    setupFormValidation();
+});
+
+function initializeFormBuilder() {
+    createFieldTypeSelector('field-type-selector');
+    createOptionBuilder('options-container');
+    
+    // Auto-save field labels as user types
+    const labelInput = document.getElementById('{{ field_form.label.id_for_label }}');
+    if (labelInput) {
+        let timeout;
+        labelInput.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                localStorage.setItem('draft_field_label', this.value);
+            }, 500);
+        });
+        
+        // Restore draft if available
+        const draftLabel = localStorage.getItem('draft_field_label');
+        if (draftLabel && !labelInput.value) {
+            labelInput.value = draftLabel;
+        }
+    }
+}
+
+function initializeFieldSorting() {
+    const fieldsContainer = document.getElementById('fields-container');
+    if (fieldsContainer && window.Sortable) {
+        new Sortable(fieldsContainer, {
+            handle: '.field-handle',
+            animation: 200,
+            ghostClass: 'dragging',
+            chosenClass: 'chosen',
+            dragClass: 'drag',
+            onStart: function(evt) {
+                evt.item.classList.add('dragging');
+            },
+            onEnd: function(evt) {
+                evt.item.classList.remove('dragging');
+                
+                // Update field order via AJAX
+                const fieldOrder = Array.from(fieldsContainer.children).map((item, index) => ({
+                    id: item.dataset.fieldId,
+                    order: index
+                }));
+                
+                updateFieldOrder(fieldOrder);
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error deleting field. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error deleting field. Please try again.');
         });
     }
 }
 
-// Auto-hide/show options field based on field type
-document.getElementById('{{ field_form.field_type.id_for_label }}').addEventListener('change', function() {
-    const optionsGroup = document.getElementById('{{ field_form.options_text.id_for_label }}').closest('.form-group-google');
-    const requiresOptions = ['radio', 'checkbox', 'select'].includes(this.value);
-    optionsGroup.style.display = requiresOptions ? 'block' : 'none';
-});
+function setupFormValidation() {
+    const form = document.getElementById('field-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Show loading state
+            const submitBtn = document.getElementById('add-field-btn');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+            const btnText = submitBtn.querySelector('span');
+            
+            submitBtn.disabled = true;
+            spinner.style.display = 'inline-block';
+            btnText.textContent = 'Adding field...';
+        });
+    }
+}
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    const fieldTypeSelect = document.getElementById('{{ field_form.field_type.id_for_label }}');
-    if (fieldTypeSelect.value) {
-        fieldTypeSelect.dispatchEvent(new Event('change'));
+function validateForm() {
+    let isValid = true;
+    const errors = [];
+    
+    // Validate field label
+    const labelInput = document.getElementById('{{ field_form.label.id_for_label }}');
+    if (!labelInput.value.trim()) {
+        isValid = false;
+        errors.push('Field label is required');
+        labelInput.classList.add('is-invalid');
+    } else {
+        labelInput.classList.remove('is-invalid');
+    }
+    
+    // Validate field type
+    const fieldType = document.getElementById('field_type').value;
+    if (!fieldType) {
+        isValid = false;
+        errors.push('Please select a field type');
+    }
+    
+    // Validate options for choice fields
+    const needsOptions = ['radio', 'checkbox', 'dropdown'].includes(fieldType);
+    const optionsText = document.getElementById('options_text').value;
+    
+    if (needsOptions && !optionsText.trim()) {
+        isValid = false;
+        errors.push('Please add at least one option for this field type');
+        document.querySelector('.option-builder').classList.add('is-invalid');
+    } else {
+        document.querySelector('.option-builder')?.classList.remove('is-invalid');
+    }
+    
+    // Show validation errors
+    if (!isValid) {
+        showValidationErrors(errors);
+    }
+    
+    return isValid;
+}
+
+function showValidationErrors(errors) {
+    // Remove existing error alerts
+    const existingAlert = document.querySelector('.validation-alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+    
+    // Create new error alert
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger validation-alert fade-in';
+    alertDiv.innerHTML = `
+        <div class="d-flex align-items-center mb-2">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Please fix the following errors:</strong>
+        </div>
+        ${errors.map(error => `<div class="small">• ${error}</div>`).join('')}
+    `;
+    
+    // Insert before the form
+    const form = document.getElementById('field-form');
+    form.parentNode.insertBefore(alertDiv, form);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+function deleteField(fieldId) {
+    if (!confirm('Are you sure you want to delete this field? This action cannot be undone.')) {
+        return;
+    }
+    
+    const fieldElement = document.querySelector(`[data-field-id="${fieldId}"]`);
+    if (fieldElement) {
+        fieldElement.style.opacity = '0.5';
+        fieldElement.style.pointerEvents = 'none';
+    }
+    
+    fetch(`/forms/api/fields/${fieldId}/delete/`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Animate field removal
+            if (fieldElement) {
+                fieldElement.style.transform = 'translateX(-100%)';
+                fieldElement.style.opacity = '0';
+                setTimeout(() => {
+                    fieldElement.remove();
+                    updateFieldCount();
+                    
+                    // Show success message
+                    showNotification('Field deleted successfully', 'success');
+                }, 300);
+            }
+        } else {
+            // Restore field state on error
+            if (fieldElement) {
+                fieldElement.style.opacity = '1';
+                fieldElement.style.pointerEvents = 'auto';
+            }
+            showNotification('Error deleting field. Please try again.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Restore field state on error
+        if (fieldElement) {
+            fieldElement.style.opacity = '1';
+            fieldElement.style.pointerEvents = 'auto';
+        }
+        showNotification('Error deleting field. Please try again.', 'error');
+    });
+}
+
+function editField(fieldId) {
+    // TODO: Implement inline field editing
+    console.log('Edit field', fieldId);
+    showNotification('Field editing feature coming soon!', 'info');
+}
+
+function updateFieldOrder(fieldOrder) {
+    fetch('/forms/api/fields/reorder/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ field_order: fieldOrder })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Field order updated', 'success');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating field order:', error);
+    });
+}
+
+function updateFieldCount() {
+    const fieldsContainer = document.getElementById('fields-container');
+    const fields = fieldsContainer.querySelectorAll('.field-item');
+    const countElement = document.querySelector('.form-card-header .text-muted');
+    if (countElement) {
+        const count = fields.length;
+        countElement.textContent = `${count} field${count !== 1 ? 's' : ''}`;
+    }
+}
+
+function resetForm() {
+    if (confirm('Are you sure you want to clear the form? This will reset all your inputs.')) {
+        document.getElementById('field-form').reset();
+        document.getElementById('field_type').value = '';
+        document.getElementById('options_text').value = '';
+        
+        // Reset field type selector
+        document.querySelectorAll('.field-type-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        // Hide options builder
+        const optionsBuilder = document.getElementById('options-builder');
+        if (optionsBuilder) {
+            optionsBuilder.style.display = 'none';
+        }
+        
+        // Clear localStorage
+        localStorage.removeItem('draft_field_label');
+        
+        showNotification('Form cleared', 'info');
+    }
+}
+
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification-toast');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    // Create notification
+    const notification = document.createElement('div');
+    notification.className = `notification-toast alert alert-${type === 'error' ? 'danger' : type} fade-in`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1060;
+        min-width: 300px;
+        border-radius: 6px;
+        box-shadow: var(--shadow-medium);
+    `;
+    
+    const icons = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+    };
+    
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="${icons[type]} me-2"></i>
+            <span>${message}</span>
+            <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 3000);
+}
+
+// Form submission success handling
+window.addEventListener('load', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'field_added') {
+        showNotification('Field added successfully!', 'success');
+        
+        // Clear form and localStorage
+        document.getElementById('field-form').reset();
+        localStorage.removeItem('draft_field_label');
+        
+        // Re-initialize form builder
+        setTimeout(() => {
+            initializeFormBuilder();
+        }, 100);
     }
 });
 </script>
+
+<!-- Add SortableJS for drag and drop -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+<!-- Add additional CSS for enhanced UX -->
+<style>
+.sticky-form-panel {
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.chosen {
+    opacity: 0.8;
+}
+
+.drag {
+    transform: rotate(5deg);
+}
+
+.notification-toast {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 992px) {
+    .sticky-form-panel {
+        position: static;
+    }
+}
+
+.form-help {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+.needs-validation .form-input-google:invalid {
+    border-bottom-color: var(--error-color);
+}
+
+.needs-validation .is-invalid {
+    border-color: var(--error-color);
+}
+</style>
 {% endblock %}

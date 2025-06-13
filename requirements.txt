@@ -1,0 +1,10 @@
+Django
+channels
+channels-redis
+redis
+psycopg2-binary
+dj-database-url
+gunicorn
+whitenoise
+python-decouple
+celery
