@@ -17,6 +17,7 @@ cryptography==45.0.4
 daphne==4.2.0
 dj-database-url==3.0.0
 Django==5.2.3
+djangorest-framework==3.16.0
 gunicorn==23.0.0
 hyperlink==21.0.0
 idna==3.10
