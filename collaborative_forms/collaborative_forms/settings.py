@@ -55,7 +55,7 @@ else:
         'http://127.0.0.1:8000',
         'http://localhost:8000',
     ]
-
+    ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,7 +69,17 @@ INSTALLED_APPS = [
     'channels',
     'accounts',
     'forms',
+    'rest_framework',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
 AUTH_USER_MODEL = 'accounts.User'
 
