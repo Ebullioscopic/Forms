@@ -1312,9 +1312,14 @@
                                 <i class="fas fa-sign-in-alt me-3 text-muted"></i>Join Form
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:logout' %}">
-                                <i class="fas fa-sign-out-alt me-3 text-muted"></i>Logout
-                            </a></li>
+                            <li>
+                                <form method="post" action="{% url 'accounts:logout' %}" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item d-flex align-items-center" style="background: none; border: none; width: 100%; text-align: left; cursor: pointer;">
+                                        <i class="fas fa-sign-out-alt me-3 text-muted"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
                         </ul>
                     </div>
                 {% else %}
